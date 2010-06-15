@@ -1,8 +1,8 @@
 <?php
 
 class WriteStream {
-	private $streamData;
-	private $endPointer;
+	protected $streamData;
+	protected $endPointer;
 	
 	public function __construct() {
 		$this->streamData = array();
