@@ -68,6 +68,21 @@ class ReadStream {
 		return $this->atEnd() ? null : $dataFromBufferHead = chr($this->streamData[$this->endPointer++]);
 	}
 	
+	public function readString($length = 1) {
+		if($length < 0) {
+			throw new Exception('String index out of bounds');
+		}
+		
+		$length = $length > $this->size - $this->endPointer ? $this->size - $this->endPointer : $length;
+		
+		$readString = '';
+		for($currentCharacter = 0; $currentCharacter < $length; $currentCharacter++) {
+			$readString .= chr($this->streamData[$this->endPointer++]);
+		}
+		
+		return $readString;
+	}
+	
 	public function peekChar() {
 		return $this->atEnd() ? null : $dataFromBufferHead = chr($this->streamData[$this->endPointer]);
 	}
