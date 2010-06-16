@@ -6,7 +6,7 @@ class ReadStream {
 	private $size;
 	private $markPosition;
 	
-	public function __construct($data = '') {
+	public function __construct($data = null) {
 		$this->streamData = array();
 		$this->endPointer = 0;
 		$this->markPosition = -1;
@@ -30,8 +30,7 @@ class ReadStream {
 	
 	public function read() {
 		if($this->endPointer < $this->size) {
-			$dataFromBufferHead = $this->streamData[$this->endPointer];
-			$this->endPointer++;
+			$dataFromBufferHead = $this->streamData[$this->endPointer++];
 		} else {
 			$dataFromBufferHead = -1;
 		}
@@ -110,7 +109,7 @@ class ReadStream {
 	}
 	
 	public function peek() {
-		if($this->endPointer < $this->size) {
+		if(!$this->atEnd()) {
 			$dataFromBufferHead = $this->streamData[$this->endPointer];
 		} else {
 			$dataFromBufferHead = -1;
@@ -119,7 +118,7 @@ class ReadStream {
 	}
 	
 	public function peekChar() {
-		if($this->endPointer < $this->size) {
+		if(!$this->atEnd()) {
 			$dataFromBufferHead = chr($this->streamData[$this->endPointer]);
 		} else {
 			$dataFromBufferHead = '';
@@ -150,7 +149,7 @@ class ReadStream {
 			$length = $minimumSkip;
 		}
 		
-		$this->endPointer = $this->endPointer + $length;
+		$this->endPointer +=  $length;
 		return $length;
 	}
 	
