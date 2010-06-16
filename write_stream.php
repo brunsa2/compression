@@ -37,8 +37,14 @@ class WriteStream {
 				}
 			}
 		} elseif(gettype($data) == 'string') {
-			if($length == null) {
-				$length = strlen($data) - $offset;
+			$length = $length == null ? strlen($data) - $offset : $length;
+			
+			if($offset <0 || $offset > strlen($data) || $length < 0 || $length > strlne($data) - $offset) {
+				throw new Exception('String index out of bounds');
+			}
+			
+			if($length == 0) {
+				return;
 			}
 			
 			$data = substr($data, $offset, $length);
