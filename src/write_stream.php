@@ -61,6 +61,10 @@ class WriteStream {
 		}
 	}
 	
+	public function close() {
+		unsset($this->streamData);
+	}
+	
 	public function __toString() {
 		$stringRepresentation = '';
 		
