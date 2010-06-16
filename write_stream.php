@@ -10,16 +10,12 @@ class WriteStream {
 	}
 	
 	public function writeInt($data = 0) {
-		$data = (integer) $data & 0xff;
-		
-		$this->streamData[$this->endPointer++] = $data;
+		$this->streamData[$this->endPointer++] = (integer) $data & 0xff;
 	}
 	
 	public function write($data = null, $offset = 0, $length = null) {
 		if(gettype($data) == 'array') {
-			if($length == null) {
-				$length = count($data) - $offset;
-			}
+			$length = $length == null ? count($data) - $offset : $length;
 			
 			if($offset < 0 || $offset > count($data) || $length < 0 || $length > count($data) - $offset) {
 				throw new Exception('Array index out of bounds');
@@ -44,7 +40,7 @@ class WriteStream {
 			if($length == null) {
 				$length = strlen($data) - $offset;
 			}
-
+			
 			$data = substr($data, $offset, $length);
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($data); $currentCharacter++) {
