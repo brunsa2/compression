@@ -20,7 +20,7 @@ class ReadStream {
 		$this->size = strlen($data);
 	}
 	
-	public function readToArray(&$array, $startPosition = 0, $length = 1) {
+	public function readToArray(array &$dataArray, $startPosition = 0, $length = 1) {
 		if($this->isClosed()) {
 			throw new Exception('ReadStream has been closed.');
 		}
@@ -44,14 +44,14 @@ class ReadStream {
 		$lengthToRead = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
 		
 		for($currentPosition = $startPosition; $currentPosition < $startPosition + $lengthToRead; $currentPosition++) {
-			$array[$currentPosition] = $this->streamData[$this->endPointer];
+			$dataArray[$currentPosition] = $this->streamData[$this->endPointer];
 			$this->endPointer++;
 		}
 		
 		return $lengthToRead;
 	}
 	
-	public function readCharsToArray(&$array, $startPosition = 0, $length = 1) {
+	public function readCharsToArray(array &$dataArray, $startPosition = 0, $length = 1) {
 		if($this->isClosed()) {
 			throw new Exception('ReadStream has been closed.');
 		}
@@ -75,7 +75,7 @@ class ReadStream {
 		$lengthToRead = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
 		
 		for($currentPosition = $startPosition; $currentPosition < $startPosition + $lengthToRead; $currentPosition++) {
-			$array[$currentPosition] = chr($this->streamData[$this->endPointer]);
+			$dataArray[$currentPosition] = chr($this->streamData[$this->endPointer]);
 			$this->endPointer++;
 		}
 		
