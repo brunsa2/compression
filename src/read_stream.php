@@ -156,7 +156,7 @@ class ReadStream {
 	public function __toString() {
 		$stringRepresentation = '';
 		
-		for($currentIndex = $this->endPointer; $currentIndex < $this->size; $currentIndex++) {
+		for($currentIndex = 0; $currentIndex < $this->size; $currentIndex++) {
 			$stringRepresentation .= chr($this->streamData[$currentIndex]);
 		}
 		
