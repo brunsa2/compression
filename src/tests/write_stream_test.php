@@ -35,6 +35,16 @@ class WriteStreamTest extends PHPUnit_Framework_TestCase {
 		$stream->write(123);
 		$stream->assertEquals((string) $stream, 'ABCBCBABCBCB123');
 	}
+	
+	/**
+	 * @depends testWrite
+	 */
+	public function testToString() {
+		$stream = new WriteStream();
+		$stream->write('ABC');
+		
+		$this->assertEquals((string) $stream, 'ABC');
+	}
 }
 
 ?>
