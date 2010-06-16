@@ -1,7 +1,7 @@
 <?php
 
 /**
- * write_stream.php contains class {@link WriteStream}
+ * write_stream.php contains class {@link WriteStream}.
  *
  * @author Jeff Stubler
  * @version 1.0
@@ -29,7 +29,7 @@ class WriteStream {
 	protected $endPointer;
 	
 	/**
-	 * Creates a new WriteStream object.
+	 * Creates a new {@code WriteStream} object.
 	 */
 	public function __construct() {
 		$this->streamData = array();
@@ -51,7 +51,9 @@ class WriteStream {
 	 * Write data to the stream. Data is written as a string.
 	 *
 	 * @param mixed $data Data to write to the stream;
-	 * @param integer $offset Starting position in 
+	 * @param integer $offset Starting position in array or string to write (Optional: defaults to 0).
+	 * @param integer $length Length in array or string to write (Optional: defaults to array or
+	 * string length left after offset).
 	 */
 	public function write($data = null, $offset = 0, $length = null) {
 		if(gettype($data) == 'array') {
@@ -97,6 +99,11 @@ class WriteStream {
 		}
 	}
 	
+	/**
+	 * Return the stream as a string.
+	 *
+	 * @return string The contents of the buffer.
+	 */
 	public function __toString() {
 		$stringRepresentation = '';
 		
