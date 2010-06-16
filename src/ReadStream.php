@@ -62,7 +62,7 @@ class ReadStream {
 	 * if one has been set.
 	 */
 	public function reset() {
-		if(!$this->isClosed()) {
+		if($this->isClosed()) {
 			throw new Exception('ReadStream has been closed.');
 		}
 		
@@ -89,7 +89,7 @@ class ReadStream {
 	 */
 	public function readToArray(array &$buffer, $offset = 0, $length = null) {
 		if($this->isClosed()) {
-			throw new Excpetion('ReadStream has been closed');
+			throw new Exception('ReadStream has been closed');
 		}
 		
 		$length = $length == null ? $this->size - $this->endPointer : $length;
@@ -121,7 +121,7 @@ class ReadStream {
 	 * @return string Next character from the stream.
 	 */
 	public function readChar() {
-		return $this->atEnd() ? '' : chr($this->streamData[$this->endPointer]);
+		return $this->atEnd() ? '' : chr($this->streamData[$this->endPointer++]);
 	}
 	
 	/**
@@ -156,7 +156,7 @@ class ReadStream {
 	 */
 	public function readCharsToArray(array &$buffer, $offset = 0, $length = null) {
 		if($this->isClosed()) {
-			throw new Excpetion('ReadStream has been closed');
+			throw new Exception('ReadStream has been closed');
 		}
 		
 		$length = $length == null ? $this->size - $this->endPointer : $length;
@@ -204,7 +204,7 @@ class ReadStream {
 	 * Closes the stream.
 	 */
 	public function close() {
-		unsset($this->streamData);
+		unset($this->streamData);
 	}
 	
 	/**
@@ -213,7 +213,7 @@ class ReadStream {
 	 * @return boolean True if the stream has been closed.
 	 */
 	public function isClosed() {
-		return isset($this->streamData);
+		return !isset($this->streamData);
 	}
 	
 	/**
@@ -224,8 +224,8 @@ class ReadStream {
 	 * @return integer Length that was actually skipped.
 	 */
 	public function skip($length = 1) {
-		if(!$this->isClosed()) {
-			throw new Excpetion('ReadStream has been closed.');
+		if($this->isClosed()) {
+			throw new Exception('ReadStream has been closed.');
 		}
 		
 		$minimumSkip = -$this->endPointer;

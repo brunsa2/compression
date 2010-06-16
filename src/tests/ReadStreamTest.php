@@ -1,7 +1,7 @@
 <?php
 
 require_once('PHPUnit/Framework.php');
-require_once('../read_Stream.php');
+require_once('../read_stream.php');
 
 class ReadStreamTest extends PHPUnit_Framework_TestCase {
 	public function testReadReadCharPeekAndPeekChar() {
@@ -16,68 +16,70 @@ class ReadStreamTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	public function testReadToArray() {
-		$stream = new ReadStream('ABCBCB');
-		
+		$stream = new ReadStream('ABC');
 		$arrayFromStream = array();
 		
 		$count = $stream->readToArray($arrayFromStream);
-		$this->assertEquals($count, 3);
+		$this->assertEquals(3, $count);
 		$this->assertEquals($arrayFromStream[0], 65);
-		$this->assertEquals($arrayFromStream[0], 66);
-		$this->assertEquals($arrayFromStream[0], 67);
+		$this->assertEquals($arrayFromStream[1], 66);
+		$this->assertEquals($arrayFromStream[2], 67);
 		
+		$stream = new ReadStream('ABC');
 		$arrayFromStream = array();
 		
 		$count = $stream->readToArray($arrayFromStream, 1);
-		$this->assertEquals($count, 3);
-		$this->assertEquals($arrayFromStream[1], 66);
-		$this->assertEquals($arrayFromStream[2], 67);
+		$this->assertEquals(3, $count);
+		$this->assertEquals($arrayFromStream[1], 65);
+		$this->assertEquals($arrayFromStream[2], 66);
 		
+		$stream = new ReadStream('ABC');
 		$arrayFromStream = array();
 		
 		$count = $stream->readToArray($arrayFromStream, 1, 1);
-		$this->assertEquals($count, 3);
-		$this->assertEquals($arrayFromStream[1], 66);
+		$this->assertEquals($count, 1);
+		$this->assertEquals($arrayFromStream[1], 65);
 	}
 	
 	public function testReadCharsToArray() {
-		$stream = new ReadStream('ABCBCB');
-		
+		$stream = new ReadStream('ABC');
 		$arrayFromStream = array();
 		
 		$count = $stream->readCharsToArray($arrayFromStream);
-		$this->assertEquals($count, 3);
-		$this->assertEquals($arrayFromStream[0], 65);
-		$this->assertEquals($arrayFromStream[0], 66);
-		$this->assertEquals($arrayFromStream[0], 67);
+		$this->assertEquals(3, $count);
+		$this->assertEquals($arrayFromStream[0], 'A');
+		$this->assertEquals($arrayFromStream[1], 'B');
+		$this->assertEquals($arrayFromStream[2], 'C');
 		
+		$stream = new ReadStream('ABC');
 		$arrayFromStream = array();
 		
 		$count = $stream->readCharsToArray($arrayFromStream, 1);
-		$this->assertEquals($count, 3);
-		$this->assertEquals($arrayFromStream[1], 66);
-		$this->assertEquals($arrayFromStream[2], 67);
+		$this->assertEquals(3, $count);
+		$this->assertEquals($arrayFromStream[1], 'A');
+		$this->assertEquals($arrayFromStream[2], 'B');
 		
+		$stream = new ReadStream('ABC');
 		$arrayFromStream = array();
 		
 		$count = $stream->readCharsToArray($arrayFromStream, 1, 1);
-		$this->assertEquals($count, 3);
-		$this->assertEquals($arrayFromStream[1], 66);
+		$this->assertEquals($count, 1);
+		$this->assertEquals($arrayFromStream[1], 'A');
 	}
 	
 	/**
 	 * @depends testReadReadCharPeekAndPeekChar
 	 */
 	public function testResetAndMark() {
-		$stream = new ReadString('AB');
+		$stream = new ReadStream('AB');
 		
 		$this->assertEquals($stream->readChar(), 'A');
-		$this->reset();
+		$stream->reset();
 		$this->assertEquals($stream->readChar(), 'A');
-		$this->mark(1);
-		$this->reset();
+		$stream->mark(1);
+		$stream->reset();
 		$this->assertEquals($stream->readChar(), 'B');
-		$this->reset();
+		$stream->reset();
 		$this->assertEquals($stream->readChar(), 'B');
 	}
 	
@@ -89,10 +91,10 @@ class ReadStreamTest extends PHPUnit_Framework_TestCase {
 		$stream = new ReadStream('A');
 		
 		$this->assertEquals($stream->atEnd(), false);
-		$this->read();
+		$stream->read();
 		$this->assertEquals($stream->atEnd(), true);
 		
-		$this->reset();
+		$stream->reset();
 		
 		$this->assertEquals($stream->isClosed(), false);
 		$stream->close();
