@@ -29,22 +29,19 @@ class ReadStream {
 	}
 	
 	public function read() {
-		if($this->endPointer < $this->size) {
-			$dataFromBufferHead = $this->streamData[$this->endPointer++];
-		} else {
-			$dataFromBufferHead = -1;
-		}
-		return $dataFromBufferHead;
+		return $this->atEnd() ? -1 : $dataFromBufferHead = $this->streamData[$this->endPointer++];
+	}
+	
+	public function peek() {
+		return $this->atEnd() ? -1 : $dataFromBufferHead = $this->streamData[$this->endPointer];
 	}
 	
 	public function readToArray(array &$buffer, $offset = 0, $length = null) {
 		if($this->isClosed()) {
 			throw new Excpetion('ReadStream has been closed');
 		}
-			
-		if($length == null) {
-			$length = $this->size - $this->endPointer;
-		}
+		
+		$length = $length == null ? $this->size - $this->endPointer : $length;
 		
 		if($offset < 0 || $length < 0) {
 			throw new Exception('Array index out of bounds');
@@ -68,24 +65,19 @@ class ReadStream {
 	}
 	
 	public function readChar() {
-		if($this->endPointer < $this->size) {
-			$dataFromBufferHead = chr($this->streamData[$this->endPointer]);
-			$this->endPointer++;
-		} else {
-			$dataFromBufferHead = '';
-		}
-		
-		return $dataFromBufferHead;
+		return $this->atEnd() ? null : $dataFromBufferHead = chr($this->streamData[$this->endPointer++]);
+	}
+	
+	public function peekChar() {
+		return $this->atEnd() ? null : $dataFromBufferHead = chr($this->streamData[$this->endPointer]);
 	}
 	
 	public function readCharsToArray(array &$buffer, $offset = 0, $length = null) {
 		if($this->isClosed()) {
 			throw new Excpetion('ReadStream has been closed');
 		}
-			
-		if($length == null) {
-			$length = $this->size - $this->endPointer;
-		}
+		
+		$length = $length == null ? $this->size - $this->endPointer : $length;
 		
 		if($offset < 0 || $length < 0) {
 			throw new Exception('Array index out of bounds');
@@ -108,31 +100,12 @@ class ReadStream {
 		return $length;
 	}
 	
-	public function peek() {
-		if(!$this->atEnd()) {
-			$dataFromBufferHead = $this->streamData[$this->endPointer];
+	public function mark($position = 0) {
+		if(!$this->isClosed()) {
+			$this->markPosition = $position;
 		} else {
-			$dataFromBufferHead = -1;
+			throw new Exception('ReadStream has been closed.');
 		}
-		return $dataFromBufferHead;
-	}
-	
-	public function peekChar() {
-		if(!$this->atEnd()) {
-			$dataFromBufferHead = chr($this->streamData[$this->endPointer]);
-		} else {
-			$dataFromBufferHead = '';
-		}
-		
-		return $dataFromBufferHead;
-	}
-	
-	public function close() {
-		$this->streamData = null;
-	}
-	
-	public function isClosed() {
-		return $this->streamData == null;
 	}
 	
 	public function skip($length = 1) {
@@ -149,20 +122,20 @@ class ReadStream {
 			$length = $minimumSkip;
 		}
 		
-		$this->endPointer +=  $length;
+		$this->endPointer += $length;
 		return $length;
+	}
+	
+	public function close() {
+		$this->streamData = null;
+	}
+	
+	public function isClosed() {
+		return $this->streamData == null;
 	}
 	
 	public function atEnd() {
 		return $this->size == $this->endPointer;
-	}
-	
-	public function mark($position = 0) {
-		if(!$this->isClosed()) {
-			$this->markPosition = $position;
-		} else {
-			throw new Exception('ReadStream has been closed.');
-		}
 	}
 	
 	public function __toString() {
