@@ -20,68 +20,6 @@ class ReadStream {
 		$this->size = strlen($data);
 	}
 	
-	public function readToArray(array &$dataArray, $startPosition = 0, $length = 1) {
-		if($this->isClosed()) {
-			throw new Exception('ReadStream has been closed.');
-		}
-		
-		if($startPosition < 0) {
-			throw new Exception('Start position out of bounds');
-		}
-		
-		if($length < 0) {
-			throw new Exception('Length out of bounds');
-		}
-		
-		if($length == 0) {
-			return 0;
-		}
-		
-		if($this->size == $this->endPointer) {
-			return -1;
-		}
-		
-		$lengthToRead = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
-		
-		for($currentPosition = $startPosition; $currentPosition < $startPosition + $lengthToRead; $currentPosition++) {
-			$dataArray[$currentPosition] = $this->streamData[$this->endPointer];
-			$this->endPointer++;
-		}
-		
-		return $lengthToRead;
-	}
-	
-	public function readCharsToArray(array &$dataArray, $startPosition = 0, $length = 1) {
-		if($this->isClosed()) {
-			throw new Exception('ReadStream has been closed.');
-		}
-		
-		if($startPosition < 0) {
-			throw new Exception('Start position out of bounds');
-		}
-		
-		if($length < 0) {
-			throw new Exception('Length out of bounds');
-		}
-		
-		if($length == 0) {
-			return 0;
-		}
-		
-		if($this->size == $this->endPointer) {
-			return -1;
-		}
-		
-		$lengthToRead = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
-		
-		for($currentPosition = $startPosition; $currentPosition < $startPosition + $lengthToRead; $currentPosition++) {
-			$dataArray[$currentPosition] = chr($this->streamData[$this->endPointer]);
-			$this->endPointer++;
-		}
-		
-		return $lengthToRead;
-	}
-	
 	public function reset() {
 		if(!$this->isClosed()) {
 			throw new Exception('ReadStream has been closed.');
@@ -100,6 +38,36 @@ class ReadStream {
 		return $dataFromBufferHead;
 	}
 	
+	public function readToArray(array &$buffer, $offset = 0, $length = null) {
+		if($this->isClosed()) {
+			throw new Excpetion('ReadStream has been closed');
+		}
+			
+		if($length == null) {
+			$length = $this->size - $this->endPointer;
+		}
+		
+		if($offset < 0 || $length < 0) {
+			throw new Exception('Array index out of bounds');
+		}
+		
+		if($length == 0) {
+			return 0;
+		}
+		
+		if($this->atEnd()) {
+			return -1;
+		}
+		
+		$length = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
+		
+		for($currentIndex = $offset; $currentIndex < $offset + $length; $currentIndex++) {
+			$buffer[$currentIndex] = $this->streamData[$this->endPointer++];
+		}
+		
+		return $length;
+	}
+	
 	public function readChar() {
 		if($this->endPointer < $this->size) {
 			$dataFromBufferHead = chr($this->streamData[$this->endPointer]);
@@ -109,6 +77,36 @@ class ReadStream {
 		}
 		
 		return $dataFromBufferHead;
+	}
+	
+	public function readCharsToArray(array &$buffer, $offset = 0, $length = null) {
+		if($this->isClosed()) {
+			throw new Excpetion('ReadStream has been closed');
+		}
+			
+		if($length == null) {
+			$length = $this->size - $this->endPointer;
+		}
+		
+		if($offset < 0 || $length < 0) {
+			throw new Exception('Array index out of bounds');
+		}
+		
+		if($length == 0) {
+			return 0;
+		}
+		
+		if($this->atEnd()) {
+			return -1;
+		}
+		
+		$length = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
+		
+		for($currentIndex = $offset; $currentIndex < $offset + $length; $currentIndex++) {
+			$buffer[$currentIndex] = chr($this->streamData[$this->endPointer++]);
+		}
+		
+		return $length;
 	}
 	
 	public function peek() {
@@ -157,7 +155,7 @@ class ReadStream {
 	}
 	
 	public function atEnd() {
-		return $this->endPointer == $this->size;
+		return $this->size == $this->endPointer;
 	}
 	
 	public function mark($position = 0) {

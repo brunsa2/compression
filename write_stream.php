@@ -10,14 +10,9 @@ class WriteStream {
 	}
 	
 	public function writeInt($data = 0) {
-		if(gettype($data) != 'integer') {
-			throw new Exception('Integer was expected but ' . gettype($data) . ' was passed');
-		} else {
-			$data = $data & 0xff;
-		}
+		$data = (integer) $data & 0xff;
 		
-		$this->streamData[$this->endPointer] = $data;
-		$this->endPointer++;
+		$this->streamData[$this->endPointer++] = $data;
 	}
 	
 	public function write($data = null, $offset = 0, $length = null) {
@@ -42,27 +37,24 @@ class WriteStream {
 				$stringRepresentation = (string) $data[$currentIndex];
 				
 				for($currentCharacter = 0; $currentCharacter < strlen($stringRepresentation); $currentCharacter++) {
-					$this->streamData[$this->endPointer] = ord(substr($stringRepresentation, $currentCharacter, 1));
-					$this->endPointer++;
+					$this->streamData[$this->endPointer++] = ord(substr($stringRepresentation, $currentCharacter, 1));
 				}
 			}
 		} elseif(gettype($data) == 'string') {
 			if($length == null) {
 				$length = strlen($data) - $offset;
 			}
-			//echo "$data; Length: $length; Offset: $offset<br />";
+
 			$data = substr($data, $offset, $length);
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($data); $currentCharacter++) {
-				$this->streamData[$this->endPointer] = ord(substr($data, $currentCharacter, 1));
-				$this->endPointer++;
+				$this->streamData[$this->endPointer++] = ord(substr($data, $currentCharacter, 1));
 			}
 		} else {
 			$stringRepresentation = (string) $data;
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($stringRepresentation); $currentCharacter++) {
-				$this->streamData[$this->endPointer] = ord(substr($stringRepresentation, $currentCharacter, 1));
-				$this->endPointer++;
+				$this->streamData[$this->endPointer++] = ord(substr($stringRepresentation, $currentCharacter, 1));
 			}
 		}
 	}
