@@ -23,10 +23,15 @@ $dec = new DecompressionStream(new ReadStream($com));
 $decString = (string) $dec;
 file_put_contents('moby_un2.txt', $decString);*/
 
-$cs = new CompressionStream2();
+/*$cs = new CompressionStream2();
 $cs->write(file_get_contents('moby_un.txt'));
 $cs->flush();
 echo $cs;
-file_put_contents('moby-cs.txt', $cs);
+file_put_contents('moby-cs.txt', $cs);*/
+
+$stream = new ReadStream('Hello World');
+$arr = array();
+echo $stream->readCharsToArray($arr, 2, 5);
+print_r($arr);
 
 ?>
