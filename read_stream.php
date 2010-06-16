@@ -127,11 +127,11 @@ class ReadStream {
 	}
 	
 	public function close() {
-		$this->streamData = null;
+		unset($this->streamData);
 	}
 	
 	public function isClosed() {
-		return $this->streamData == null;
+		return isset($this->streamData);
 	}
 	
 	public function atEnd() {
