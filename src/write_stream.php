@@ -1,21 +1,65 @@
 <?php
 
+/**
+ * write_stream.php contains class {@link WriteStream}.
+ *
+ * @author Jeff Stubler
+ * @version 1.0
+ * @package com.jeffstubler.streams;
+ */
+
+/**
+ * {@code WriteStream} provides a sequential buffer in which different data types can be
+ * appended. The entire buffer can be accessed as a string.
+ *
+ * @author Jeff Stubler
+ * @version 1.0
+ * @package com.jeffstubler.streams;
+ */
+
 class WriteStream {
+	/**
+	 * Internal data buffer.
+	 */
 	protected $streamData;
+	
+	/**
+	 * Index of last item in buffer.
+	 */
 	protected $endPointer;
 	
+	/**
+	 * Creates a new {@code WriteStream} object.
+	 */
 	public function __construct() {
 		$this->streamData = array();
 		$this->endPointer = 0;
 	}
 	
+	/**
+	 * Write a number to the stream. Only the least significant byte is written.
+	 * 
+	 * @param mixed $data Number to write to the stream.
+	 */
 	public function writeInt($data = 0) {
-		$this->streamData[$this->endPointer++] = (integer) $data & 0xff;
+		$data = (integer) $data & 0xff;
+		
+		$this->streamData[$this->endPointer++] = $data;
 	}
 	
+	/**
+	 * Write data to the stream. Data is written as a string.
+	 *
+	 * @param mixed $data Data to write to the stream;
+	 * @param integer $offset Starting position in array or string to write (Optional: defaults to 0).
+	 * @param integer $length Length in array or string to write (Optional: defaults to array or
+	 * string length left after offset).
+	 */
 	public function write($data = null, $offset = 0, $length = null) {
 		if(gettype($data) == 'array') {
-			$length = $length == null ? count($data) - $offset : $length;
+			if($length == null) {
+				$length = count($data) - $offset;
+			}
 			
 			if($offset < 0 || $offset > count($data) || $length < 0 || $length > count($data) - $offset) {
 				throw new Exception('Array index out of bounds');
@@ -37,16 +81,10 @@ class WriteStream {
 				}
 			}
 		} elseif(gettype($data) == 'string') {
-			$length = $length == null ? strlen($data) - $offset : $length;
-			
-			if($offset <0 || $offset > strlen($data) || $length < 0 || $length > strlne($data) - $offset) {
-				throw new Exception('String index out of bounds');
+			if($length == null) {
+				$length = strlen($data) - $offset;
 			}
-			
-			if($length == 0) {
-				return;
-			}
-			
+
 			$data = substr($data, $offset, $length);
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($data); $currentCharacter++) {
@@ -61,6 +99,11 @@ class WriteStream {
 		}
 	}
 	
+	/**
+	 * Return the stream as a string.
+	 *
+	 * @return string The contents of the buffer.
+	 */
 	public function __toString() {
 		$stringRepresentation = '';
 		
