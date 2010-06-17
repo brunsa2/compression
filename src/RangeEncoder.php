@@ -107,14 +107,14 @@ class RangeEncoder {
 			throw new Exception('Range encoder has been closed');
 		} else {
 			// Main portion of range encoding is here: adjust the low value and range based on the
-			// symbol to encode
+			// symbol to encode.
 			$this->range = (integer) ($this->range / $range);
 			$this->low += $low * $this->range;
 			$this->range *= $high - $low;
 			
-			// Check for range underflows or digits to emit
+			// Check for range underflows or digits to emit.
 			while($this->firstByteIsStable() || $this->rangeUnderflow()) {
-				// Correct an underflow by expanding the range
+				// Correct an underflow by expanding the range.
 				$this->range = (!$this->firstByteIsStable() && $this->rangeUnderflow()) ? ((-$this->low & $this->full) & ($this->maximumRange - 1)) : $this->range;
 				
 				$this->stream->writeInt($this->low >> $this->shiftDistance);
@@ -139,7 +139,7 @@ class RangeEncoder {
 	
 	// TODO: Commented lines in the following method must be tested with the decoder: they are
 	// to block out excessive low value bytes from being written if they are unnecessary
-	// If the decoder works with them, they can be uncommented
+	// If the decoder works with them, they can be uncommented.
 	
 	/**
 	 * Closes the encoder and emits the last bytes to the stream.

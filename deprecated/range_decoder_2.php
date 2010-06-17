@@ -2,14 +2,14 @@
 
 class RangeDecoder2 {
 	private $low = 0;
-	private $range = 0xffffffff;
+	private $range = 0xffffff;
 	private $code = 0;
 	
 	private $stream;
 	
-	const TOP = 0x1000000;
-	const BOTTOM = 0x10000;
-	const MAXIMUM_RANGE = 0x10000;
+	const TOP = 0x10000;
+	const BOTTOM = 0x100;
+	const MAXIMUM_RANGE = 0x100;
 	
 	public function __construct(ReadStream $stream) {
 		$this->stream = $stream;
@@ -21,7 +21,7 @@ class RangeDecoder2 {
 	
 	public function reset() {
 		$this->low = 0;
-		$this->range = 0xffffffff;
+		$this->range = 0xffffff;
 		$this->code = 0;
 	}
 	
@@ -37,17 +37,17 @@ class RangeDecoder2 {
 		
 		while($this->firstByteStable() || $this->rangeUnderflow()) {
 			if($this->rangeUnderflow() && !$this->firstByteStable()) {
-				$this->range = (-$this->low & 0xffffffff) & (self::BOTTOM - 1);
+				$this->range = (-$this->low & 0xffffff) & (self::BOTTOM - 1);
 			}
 			
-			$this->code = (($this->code << 8) | ($this->stream->read() & 0xff)) & 0xffffffff;
-			$this->low = ($this->low << 8) & 0xffffffff;
-			$this->range = ($this->range << 8) & 0xffffffff;
+			$this->code = (($this->code << 8) | ($this->stream->read() & 0xff)) & 0xffffff;
+			$this->low = ($this->low << 8) & 0xffffff;
+			$this->range = ($this->range << 8) & 0xffffff;
 		}
 	}
 	
 	private function firstByteStable() {
-		return (($this->low ^ ($this->low + $this->range)) & 0xffffffff) < self::TOP;
+		return (($this->low ^ ($this->low + $this->range)) & 0xffffff) < self::TOP;
 	}
 	
 	private function rangeUnderflow() {

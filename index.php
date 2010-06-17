@@ -13,9 +13,12 @@ function __autoload($class) {
 	include_once($fileName . '.php');
 }*/
 
-require_once('range_encoder_2.php');
+require_once('deprecated/range_encoder_2.php');
+require_once('deprecated/range_decoder_2.php');
 require_once('src/WriteStream.php');
+require_once('src/ReadStream.php');
 require_once('src/RangeEncoder.php');
+require_once('src/RangeDecoder.php');
 
 /*$unc = file_get_contents('moby_un.txt');
 $comp = new CompressionStream(new ReadStream($unc));
@@ -38,7 +41,7 @@ $arr = array();
 echo $stream->readCharsToArray($arr, 2, 5);
 print_r($arr);*/
 
-/*$streamOne = new WriteStream();
+$streamOne = new WriteStream();
 $streamTwo = new WriteStream();
 
 $encOne = new RangeEncoder2($streamOne);
@@ -56,7 +59,28 @@ echo $encTwo->encodeSymbol(3, 4, 8) . '<br />';
 echo $encTwo->encodeSymbol(0, 5, 64) . '<br />';
 echo $encTwo->close() . '<br />';
 
-echo (string)$encOne->getStream() . "<br />" . (string)$encTwo->getStream();*/
+echo (string)$encOne->getStream() . "<br />" . (string)$encTwo->getStream();
+
+$decOne = new RangeDecoder2(new ReadStream($encOne->getStream()));
+echo $decOne->getCode(16) . '<br />';
+$decOne->decode(5, 7, 16);
+echo $decOne->getCode(32) . '<br />';
+$decOne->decode(2, 19, 32);
+echo $decOne->getCode(8) . '<br />';
+$decOne->decode(3, 4, 8);
+echo $decOne->getCode(64) . '<br />';
+$decOne->decode(0, 5, 64);
+
+$decTwo = new RangeDecoder(new ReadStream($encTwo->getStream()), true);
+echo $decTwo->getFrequency(16) . '<br />';
+$decTwo->removeRange(5, 7, 16);
+echo $decTwo->getFrequency(32) . '<br />';
+$decTwo->removeRange(2, 19, 32);
+echo $decTwo->getFrequency(8) . '<br />';
+$decTwo->removeRange(3, 4, 8);
+echo $decTwo->getFrequency(64) . '<br />';
+$decTwo->removeRange(0, 5, 64);
+
 /*
 for($xor = 0x80 ^ 0x90, $n = 8; $xor >= pow(2, 8 - $n); $n--);
 
