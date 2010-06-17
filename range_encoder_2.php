@@ -45,6 +45,7 @@ class RangeEncoder2 {
 			while($this->firstByteStable() || $this->rangeUnderflow()) {
 				if($this->rangeUnderflow() && !$this->firstByteStable()) {
 					$this->range = (-$this->low & 0xffffff) & (self::BOTTOM - 1);
+					echo 'Remedied underflow-range: ' . dechex($this->range) . '<br />';
 				}
 				
 				echo 'Emit digit: ' . dechex($this->low >> 16) . '<br />';
@@ -114,7 +115,7 @@ class RangeEncoder2 {
 		} elseif($xorOfBytes < 128) {
 			return 1;
 		} else {
-			return 6;
+			return 0;
 		}
 	}
 }

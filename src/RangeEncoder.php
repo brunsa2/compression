@@ -39,6 +39,11 @@ class RangeEncoder {
 	private $stream;
 	
 	/**
+	 * Number of bytes output so far
+	 */
+	private $bytesOutputToStream = 0;
+	
+	/**
 	 * Number of bits output so far
 	 */
 	private $bitsOutput = 0;
@@ -107,21 +112,34 @@ class RangeEncoder {
 			$this->low += $low * $this->range;
 			$this->range *= $high - $low;
 			
-			// Now check for range underflows or digits to emit
+			// Check for range underflows or digits to emit
 			while($this->firstByteIsStable() || $this->rangeUnderflow()) {
 				// Correct an underflow by expanding the range
-				$this->range = $this->firstByteIsStable() && !$this->rangeUnderflow() ? (-$this->low & $this->full) & ($this->maximumRange - 1) : $this->range;
+				$this->range = (!$this->firstByteIsStable() && $this->rangeUnderflow()) ? ((-$this->low & $this->full) & ($this->maximumRange - 1)) : $this->range;
 				
 				$this->stream->writeInt($this->low >> $this->shiftDistance);
 				
-				$this->low >>= $this->shiftDistance;
+				$this->low <<= $this->byteSize;
 				$this->low &= $this->full;
 				
-				$this->range >>= $this->shiftDistance;
+				$this->range <<= $this->byteSize;
 				$this->range &= $this->full;
+				
+				$this->bytesOutputToStream++;
 			}
+			
+			for($xorOfLowAndHigh = ($this->low >> $this->shiftDistance) & 0xff ^ (($this->low + $this->range) >> $this->shiftDistance) & 0xff, $stableBits = 8; $xorOfLowAndHigh >= pow(2, 8 - $stableBits); $stableBits--);
+			$bitsCurrentlyOutput = $this->bytesOutputToStream * $this->byteSize + $stableBits;
+			
+			$bitsEncodedForCurrentSymbol = $bitsCurrentlyOutput - $this->bitsOutput;
+			$this->bitsOutput = $bitsCurrentlyOutput;
+			return $bitsEncodedForCurrentSymbol;
 		}
 	}
+	
+	// TODO: Commented lines in the following method must be tested with the decoder: they are
+	// to block out excessive low value bytes from being written if they are unnecessary
+	// If the decoder works with them, they can be uncommented
 	
 	/**
 	 * Closes the encoder and emits the last bytes to the stream.
@@ -133,12 +151,24 @@ class RangeEncoder {
 			throw new Exception('Range encoder has been closed');
 		} else {
 			for($currentByte = 0; $currentByte < $this->closeByteOutput; $currentByte++) {
-				$this->stream->writeInt($this->low >> $this->shiftDistance);
+				//if($this->range > 0) {
+					$this->stream->writeInt($this->low >> $this->shiftDistance);
+					//$this->bytesOutputToStream++;
+				//} else {
+				//break;
+				//}
 				
 				$this->low <<= $this->byteSize;
 				$this->low &= $this->full;
+				
+				//$this->range <<= $this->byteSize;
+				//$this->range &= $this->full;
+				
+				$this->bytesOutputToStream++;
 			}
 		}
+		
+		return ($this->bytesOutputToStream * $this->byteSize) - $this->bitsOutput;
 	}
 	
 	/**
@@ -175,7 +205,7 @@ class RangeEncoder {
 	 * @return boolean True if the range has underflowed.
 	 */
 	private function rangeUnderflow() {
-		$this->range < $this->maximumRange;
+		return $this->range < $this->maximumRange;
 	}
 	
 	/**
