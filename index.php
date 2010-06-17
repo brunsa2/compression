@@ -29,9 +29,16 @@ $cs->flush();
 echo $cs;
 file_put_contents('moby-cs.txt', $cs);*/
 
-$stream = new ReadStream('Hello World');
+/*$stream = new ReadStream('Hello World');
 $arr = array();
 echo $stream->readCharsToArray($arr, 2, 5);
-print_r($arr);
+print_r($arr);*/
+
+$x = 10;
+echo $x . '<br />';
+$y = ($x/=5) * 2;
+echo $x . '<br />';
+echo $y . '<br />';
+
 
 ?>

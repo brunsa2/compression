@@ -5,7 +5,7 @@
  *
  * @author Jeff Stubler
  * @version 1.1
- * @package com.jeffstubler.streams;
+ * @package com.jeffstubler.streams
  */
 
 /**
@@ -13,8 +13,8 @@
  * It is initialized with a string.
  *
  * @author Jeff Stubler
- * @version 1.0
- * @package com.jeffstubler.streams;
+ * @version 1.1
+ * @package com.jeffstubler.streams
  */
 
 class ReadStream {
@@ -59,7 +59,7 @@ class ReadStream {
 	 */
 	public function reset() {
 		if($this->isClosed()) {
-			throw new Exception('ReadStream has been closed.');
+			throw new Exception('Read stream has been closed.');
 		}
 		
 		$this->endPointer = $this->markPosition == -1 ? 0 : $this->markPosition;
@@ -206,7 +206,7 @@ class ReadStream {
 	/**
 	 * Returns whether the stream has been closed.
 	 *
-	 * @return boolean True if the stream has been closed.
+	 * @return boolean True if the stream is closed.
 	 */
 	public function isClosed() {
 		return !isset($this->streamData);
