@@ -1,7 +1,7 @@
 <?php
 
 /**
- * write_stream.php contains class {@link WriteStream}.
+ * WriteStream.php contains class {@link WriteStream}.
  *
  * @author Jeff Stubler
  * @version 1.0
@@ -13,7 +13,7 @@
  * appended. The entire buffer can be accessed as a string.
  *
  * @author Jeff Stubler
- * @version 1.0
+ * @version 1.1
  * @package com.jeffstubler.streams;
  */
 
@@ -21,20 +21,12 @@ class WriteStream {
 	/**
 	 * Internal data buffer.
 	 */
-	protected $streamData;
+	protected $streamData = array();
 	
 	/**
 	 * Index of last item in buffer.
 	 */
-	protected $endPointer;
-	
-	/**
-	 * Creates a new {@code WriteStream} object.
-	 */
-	public function __construct() {
-		$this->streamData = array();
-		$this->endPointer = 0;
-	}
+	protected $endPointer = 0;
 	
 	/**
 	 * Write a number to the stream. Only the least significant byte is written.

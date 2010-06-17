@@ -1,10 +1,10 @@
 <?php
 
 /**
- * read_stream.php contains class {@link ReadStream}.
+ * ReadStream.php contains class {@link ReadStream}.
  *
  * @author Jeff Stubler
- * @version 1.0
+ * @version 1.1
  * @package com.jeffstubler.streams;
  */
 
@@ -21,12 +21,12 @@ class ReadStream {
 	/**
 	 * Internal data buffer.
 	 */
-	private $streamData;
+	private $streamData = array();
 	
 	/**
 	 * Index of last read index of the data buffer.
 	 */
-	private $endPointer;
+	private $endPointer = 0;
 	
 	/**
 	 * Total size of the data buffer.
@@ -36,7 +36,7 @@ class ReadStream {
 	/**
 	 * Mark position for reseting position.
 		*/
-	private $markPosition;
+	private $markPosition = -1;
 	
 	/**
 	 * Creates a new {@code ReadStream} object.
@@ -44,10 +44,6 @@ class ReadStream {
 	 * @param mixed $data Data to initialize the stream to.
 	 */
 	public function __construct($data = null) {
-		$this->streamData = array();
-		$this->endPointer = 0;
-		$this->markPosition = -1;
-		
 		$data = (string) $data;
 		
 		for($currentCharacter = 0; $currentCharacter < strlen($data); $currentCharacter++) {
