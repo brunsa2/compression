@@ -21,7 +21,7 @@ class ReadStream {
 	/**
 	 * Internal data buffer.
 	 */
-	private $streamData = array();
+	private $streamData = '';
 	
 	/**
 	 * Index of last read index of the data buffer.
@@ -47,7 +47,7 @@ class ReadStream {
 		$data = (string) $data;
 		
 		for($currentCharacter = 0; $currentCharacter < strlen($data); $currentCharacter++) {
-			$this->streamData[$currentCharacter] = ord(substr($data, $currentCharacter, 1));
+			$this->streamData .= substr($data, $currentCharacter, 1);
 		}
 		
 		$this->size = strlen($data);
@@ -71,7 +71,7 @@ class ReadStream {
 	 * @return integer Next character from the stream.
 	 */
 	public function read() {
-		return $this->atEnd() ? -1 : $this->streamData[$this->endPointer++];
+		return $this->atEnd() ? -1 : ord(substr($this->streamData, $this->endPointer++, 1));
 	}
 	
 	/**
@@ -105,7 +105,7 @@ class ReadStream {
 		$length = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
 		
 		for($currentIndex = $offset; $currentIndex < $offset + $length; $currentIndex++) {
-			$buffer[$currentIndex] = $this->streamData[$this->endPointer++];
+			$buffer[$currentIndex] = ord(substr($this->streamData, $this->endPointer++, 1));
 		}
 		
 		return $length;
@@ -117,7 +117,7 @@ class ReadStream {
 	 * @return string Next character from the stream.
 	 */
 	public function readChar() {
-		return $this->atEnd() ? '' : chr($this->streamData[$this->endPointer++]);
+		return $this->atEnd() ? '' : substr($this->streamData, $this->endPointer++, 1);
 	}
 	
 	/**
@@ -135,7 +135,7 @@ class ReadStream {
 		
 		$readString = '';
 		for($currentCharacter = 0; $currentCharacter < $length; $currentCharacter++) {
-			$readString .= chr($this->streamData[$this->endPointer++]);
+			$readString .= substr($this->streamData, $this->endPointer++, 1);
 		}
 		
 		return $readString;
@@ -172,7 +172,7 @@ class ReadStream {
 		$length = $this->endPointer + $length > $this->size ? $this->size : $this->endPointer + $length;
 		
 		for($currentIndex = $offset; $currentIndex < $offset + $length; $currentIndex++) {
-			$buffer[$currentIndex] = chr($this->streamData[$this->endPointer++]);
+			$buffer[$currentIndex] = substr($this->streamData, $this->endPointer++, 1);
 		}
 		
 		return $length;
@@ -184,7 +184,7 @@ class ReadStream {
 	 * @return integer Next character from the stream.
 	 */
 	public function peek() {
-		return $this->atEnd() ? -1 : $this->streamData[$this->endPointer];
+		return $this->atEnd() ? -1 : ord(substr($this->streamData, $this->endPointer, 1));
 	}
 	
 	/**
@@ -193,7 +193,7 @@ class ReadStream {
 	 * @return string Next character from the stream.
 	 */
 	public function peekChar() {
-		return $this->atEnd() ? -1 : chr($this->streamData[$this->endPointer]);
+		return $this->atEnd() ? -1 : substr($this->streamData, $this->endPointer, 1);
 	}
 	
 	/**
@@ -265,13 +265,7 @@ class ReadStream {
 	 * @return string The contents of the buffer.
 	 */
 	public function __toString() {
-		$stringRepresentation = '';
-		
-		for($currentIndex = 0; $currentIndex < $this->size; $currentIndex++) {
-			$stringRepresentation .= chr($this->streamData[$currentIndex]);
-		}
-		
-		return $stringRepresentation;
+		return $this->streamData;
 	}
 }
 
