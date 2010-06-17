@@ -190,6 +190,15 @@ class RangeEncoder {
 	}
 	
 	/**
+	 * Return the encoders's maximum range.
+	 *
+	 * @return integer Maximum range.
+	 */
+	public function getMaximumRange() {
+		return $this->maximumRange;
+	}
+	
+	/**
 	 * Returns whether the most significant byte of the low and high values of the range is stable
 	 * allowing for a byte to be emitted to the stream.
 	 *

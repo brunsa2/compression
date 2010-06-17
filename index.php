@@ -19,6 +19,8 @@ require_once('src/WriteStream.php');
 require_once('src/ReadStream.php');
 require_once('src/RangeEncoder.php');
 require_once('src/RangeDecoder.php');
+require_once('src/CompressionStream.php');
+require_once('src/Order0Model.php');
 
 /*$unc = file_get_contents('moby_un.txt');
 $comp = new CompressionStream(new ReadStream($unc));
@@ -40,7 +42,7 @@ file_put_contents('moby-cs.txt', $cs);*/
 $arr = array();
 echo $stream->readCharsToArray($arr, 2, 5);
 print_r($arr);*/
-
+/*
 $streamOne = new WriteStream();
 $streamTwo = new WriteStream();
 
@@ -79,7 +81,13 @@ $decTwo->removeRange(2, 19, 32);
 echo $decTwo->getFrequency(8) . '<br />';
 $decTwo->removeRange(3, 4, 8);
 echo $decTwo->getFrequency(64) . '<br />';
-$decTwo->removeRange(0, 5, 64);
+$decTwo->removeRange(0, 5, 64);*/
+
+$stream = new CompressionStream(true);
+$stream->write('Hello World');
+echo $stream . '<br />';
+
+echo 'Original length: ' . strlen ('Hello World') . '; Compressed length: ' . strlen($stream);
 
 /*
 for($xor = 0x80 ^ 0x90, $n = 8; $xor >= pow(2, 8 - $n); $n--);

@@ -1,6 +1,6 @@
 <?php
 
-class DecompressionStream {
+class DecompressionStream3 {
 	private $outputStream;
 	
 	public function __construct(ReadStream $inputStream) {

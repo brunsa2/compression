@@ -1,6 +1,6 @@
 <?php
 
-class CompressionStream {
+class CompressionStream3 {
 	private $outputStream;
 	
 	public function __construct(ReadStream $inputStream) {
