@@ -1,7 +1,7 @@
 <?php
 
 require_once('PHPUnit/Framework.php');
-require_once('../read_stream.php');
+require_once('../ReadStream.php');
 
 class ReadStreamTest extends PHPUnit_Framework_TestCase {
 	public function testReadReadCharPeekAndPeekChar() {

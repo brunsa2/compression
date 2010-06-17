@@ -38,25 +38,25 @@ $arr = array();
 echo $stream->readCharsToArray($arr, 2, 5);
 print_r($arr);*/
 
-$streamOne = new WriteStream();
+/*$streamOne = new WriteStream();
 $streamTwo = new WriteStream();
 
 $encOne = new RangeEncoder2($streamOne);
 $encTwo = new RangeEncoder($streamTwo, true);
-/*
+
 $encOne->encode(5, 7, 16);
 $encOne->encode(2, 19, 32);
 $encOne->encode(3, 4, 8);
 $encOne->encode(0, 5, 64);
 $encOne->flush();
-*/
+
 echo $encTwo->encodeSymbol(5, 7, 16) . '<br />';
 echo $encTwo->encodeSymbol(2, 19, 32) . '<br />';
 echo $encTwo->encodeSymbol(3, 4, 8) . '<br />';
 echo $encTwo->encodeSymbol(0, 5, 64) . '<br />';
 echo $encTwo->close() . '<br />';
 
-echo (string)$encOne->getStream() . "<br />" . (string)$encTwo->getStream();
+echo (string)$encOne->getStream() . "<br />" . (string)$encTwo->getStream();*/
 /*
 for($xor = 0x80 ^ 0x90, $n = 8; $xor >= pow(2, 8 - $n); $n--);
 

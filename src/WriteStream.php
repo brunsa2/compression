@@ -21,7 +21,7 @@ class WriteStream {
 	/**
 	 * Internal data buffer.
 	 */
-	protected $streamData = array();
+	protected $streamData = '';
 	
 	/**
 	 * Index of last item in buffer.
@@ -34,7 +34,7 @@ class WriteStream {
 	 * @param mixed $data Number to write to the stream.
 	 */
 	public function writeInt($data = 0) {
-		$this->streamData[$this->endPointer++] = (integer) $data & 0xff;
+		$this->streamData .= chr((integer) $data & 0xff);
 	}
 	
 	/**
@@ -65,7 +65,7 @@ class WriteStream {
 				$stringRepresentation = (string) $data[$currentIndex];
 				
 				for($currentCharacter = 0; $currentCharacter < strlen($stringRepresentation); $currentCharacter++) {
-					$this->streamData[$this->endPointer++] = ord(substr($stringRepresentation, $currentCharacter, 1));
+					$this->streamData .= substr($stringRepresentation, $currentCharacter, 1);
 				}
 			}
 		} elseif(gettype($data) == 'string') {
@@ -74,13 +74,13 @@ class WriteStream {
 			$data = substr($data, $offset, $length);
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($data); $currentCharacter++) {
-				$this->streamData[$this->endPointer++] = ord(substr($data, $currentCharacter, 1));
+				$this->streamData .= substr($data, $currentCharacter, 1);
 			}
 		} else {
 			$stringRepresentation = (string) $data;
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($stringRepresentation); $currentCharacter++) {
-				$this->streamData[$this->endPointer++] = ord(substr($stringRepresentation, $currentCharacter, 1));
+				$this->streamData .= substr($stringRepresentation, $currentCharacter, 1);
 			}
 		}
 	}
@@ -91,13 +91,7 @@ class WriteStream {
 	 * @return string The contents of the buffer.
 	 */
 	public function __toString() {
-		$stringRepresentation = '';
-		
-		for($currentIndex = 0; $currentIndex < $this->endPointer; $currentIndex++) {
-			$stringRepresentation .= chr($this->streamData[$currentIndex]);
-		}
-		
-		return $stringRepresentation;
+		return $this->streamData;
 	}
 }
 
