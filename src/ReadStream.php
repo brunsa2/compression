@@ -59,7 +59,7 @@ class ReadStream {
 	 */
 	public function reset() {
 		if($this->isClosed()) {
-			throw new Exception('Read stream has been closed.');
+			throw new Exception('Read stream has been closed');
 		}
 		
 		$this->endPointer = $this->markPosition == -1 ? 0 : $this->markPosition;
@@ -85,7 +85,7 @@ class ReadStream {
 	 */
 	public function readToArray(array &$buffer, $offset = 0, $length = null) {
 		if($this->isClosed()) {
-			throw new Exception('ReadStream has been closed');
+			throw new Exception('Read stream has been closed');
 		}
 		
 		$length = $length == null ? $this->size - $this->endPointer : $length;
@@ -152,7 +152,7 @@ class ReadStream {
 	 */
 	public function readCharsToArray(array &$buffer, $offset = 0, $length = null) {
 		if($this->isClosed()) {
-			throw new Exception('ReadStream has been closed');
+			throw new Exception('Read stream has been closed');
 		}
 		
 		$length = $length == null ? $this->size - $this->endPointer : $length;
@@ -221,7 +221,7 @@ class ReadStream {
 	 */
 	public function skip($length = 1) {
 		if($this->isClosed()) {
-			throw new Exception('ReadStream has been closed.');
+			throw new Exception('Read stream has been closed');
 		}
 		
 		$minimumSkip = -$this->endPointer;
@@ -255,7 +255,7 @@ class ReadStream {
 		if(!$this->isClosed()) {
 			$this->markPosition = $position;
 		} else {
-			throw new Exception('ReadStream has been closed.');
+			throw new Exception('Read stream has been closed');
 		}
 	}
 	

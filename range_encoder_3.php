@@ -1,6 +1,6 @@
 <?php
 
-class RangeEncoder {
+class RangeEncoderBlah {
 	const INITIAL_RANGE_64_TOP = 0x00ffffff;
 	const INITIAL_RANGE_64_BOTTOM = 0xffffffff;
 	const INITIAL_RANGE_32 = 0x00ffffff;

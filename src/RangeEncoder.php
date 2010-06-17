@@ -4,7 +4,7 @@
  * RangeEncoder.php contains class {@link RangeEncoder}.
  *
  * @author Jeff Stubler
- * @version 1.0
+ * @version 2.0
  * @package com.jeffstubler.compression
  */
 
@@ -13,7 +13,7 @@
  * to a {@link WriteStream}.
  *
  * @author Jeff Stubler
- * @version 1.1
+ * @version 2.0
  * @package com.jeffstubler.compression
  */
 
@@ -39,9 +39,9 @@ class RangeEncoder {
 	private $stream;
 	
 	/**
-	 * Number of bytes output so far
+	 * Number of bits output so far
 	 */
-	private $bytesOutput = 0;
+	private $bitsOutput = 0;
 	
 	/**
 	 * Full number with all bits set
@@ -69,6 +69,11 @@ class RangeEncoder {
 	private $shiftDistance;
 	
 	/**
+	 * Number of bytes to output when closing the stream.
+	 */
+	private $closeByteOutput;
+	
+	/**
 	 * Creates a new {@code RangeEncoder} with the proper constants to use either a 32- or 64-bit
 	 * processor.
 	 *
@@ -77,10 +82,109 @@ class RangeEncoder {
 	public function __construct(WriteStream $outputStream, $forceThirtyTwoBitMath = false) {
 		$this->stream = $outputStream;
 		
-		$full = ($range = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00ffffffffffffff : 0x00ffffff);
-		$stable = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x0001000000000000 : 0x00010000;
-		$maximumRange = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x0000010000000000 : 0x00000100;
-		$shiftDistance = $byteSize * (PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 6 : 2);
+		$this->full = ($this->range = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00ffffff : 0x00ffffffffffffff);
+		$this->stable = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00010000 : 0x0001000000000000;
+		$this->maximumRange = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00000100 : 0x0000010000000000;
+		$this->shiftDistance = $this->byteSize * (PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 2 : 6);
+		$this->closeByteOutput = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 4 : 8;
+	}
+	
+	/**
+	 * Encodes a symbol to the output stream.
+	 *
+	 * @param integer $low Low cumulative frequency for the encoded symbol.
+	 * @param integer $high High cumulative frequency for the encoded symbol.
+	 * @param integer $range Total frequency range for the encoded symbol.
+	 * @return integer The number of bits used to encode the symbol.
+	 */
+	public function encodeSymbol($low, $high, $range) {
+		if($this->isClosed()) {
+			throw new Exception('Range encoder has been closed');
+		} else {
+			// Main portion of range encoding is here: adjust the low value and range based on the
+			// symbol to encode
+			$this->range = (integer) ($this->range / $range);
+			$this->low += $low * $this->range;
+			$this->range *= $high - $low;
+			
+			// Now check for range underflows or digits to emit
+			while($this->firstByteIsStable() || $this->rangeUnderflow()) {
+				// Correct an underflow by expanding the range
+				$this->range = $this->firstByteIsStable() && !$this->rangeUnderflow() ? (-$this->low & $this->full) & ($this->maximumRange - 1) : $this->range;
+				
+				$this->stream->writeInt($this->low >> $this->shiftDistance);
+				
+				$this->low >>= $this->shiftDistance;
+				$this->low &= $this->full;
+				
+				$this->range >>= $this->shiftDistance;
+				$this->range &= $this->full;
+			}
+		}
+	}
+	
+	/**
+	 * Closes the encoder and emits the last bytes to the stream.
+	 *
+	 * @return integer The number of bits in the entire coded message.
+	 */
+	public function close() {
+		if($this->isClosed()) {
+			throw new Exception('Range encoder has been closed');
+		} else {
+			for($currentByte = 0; $currentByte < $this->closeByteOutput; $currentByte++) {
+				$this->stream->writeInt($this->low >> $this->shiftDistance);
+				
+				$this->low <<= $this->byteSize;
+				$this->low &= $this->full;
+			}
+		}
+	}
+	
+	/**
+	 * Returns the {@link WriteStream} object that data is being encoded to.
+	 *
+	 * @return WriteStream Output stream.
+	 */
+	public function getStream() {
+		return $this->stream;
+	}
+	
+	/**
+	 * Returns a string of the encoded data.
+	 *
+	 * @return string Output string.
+	 */
+	public function __toString() {
+		return (string) $this->stream;
+	}
+	
+	/**
+	 * Returns whether the most significant byte of the low and high values of the range is stable
+	 * allowing for a byte to be emitted to the stream.
+	 *
+	 * @return boolean True if the most significant byte is stable.
+	 */
+	private function firstByteIsStable() {
+		return (($this->low ^ ($this->low + $this->range)) & $this->full) < $this->stable;
+	}
+	
+	/**
+	 * Returns whether the range has underflowed and adjustments need to be made.
+	 *
+	 * @return boolean True if the range has underflowed.
+	 */
+	private function rangeUnderflow() {
+		$this->range < $this->maximumRange;
+	}
+	
+	/**
+	 * Returns whether the encoder is closed.
+	 *
+	 * @return boolean True if the encoder is closed.
+	 */
+	public function isClosed() {
+		return $this->closed;
 	}
 
 }

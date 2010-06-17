@@ -2,7 +2,7 @@
 
 class RangeEncoder2 {
 	private $low = 0;
-	private $range = 0xffffffff;
+	private $range = 0xffffff;
 	
 	private $flushed = false;
 	
@@ -13,8 +13,8 @@ class RangeEncoder2 {
 	private $currentByte;
 	private $bytesOutput;
 	
-	const TOP = 0x1000000;
-	const BOTTOM = 0x10000;
+	const TOP = 0x10000;
+	const BOTTOM = 0x100;
 	
 	public function __construct(WriteStream $stream, $keepStatistics = false) {
 		$this->stream = $stream;
@@ -26,7 +26,7 @@ class RangeEncoder2 {
 	
 	public function reset() {
 		$this->low = 0;
-		$this->range = 0xffffffff;
+		$this->range = 0xffffff;
 	}
 	
 	public function encode($symbolLow, $symbolHigh, $frequencyRange) {
@@ -38,33 +38,33 @@ class RangeEncoder2 {
 			echo 'Low: ' . dechex($this->low) . '; Range: ' . dechex($this->range) . '; High: ' . dechex($this->low + $this->range) . '<br />';
 			
 			if($this->keepStatistics) {
-				$this->statistics[$this->currentByte] = $this->bytesOutput * 8 + $this->countStableBits(($this->low >> 24) & 0xff, (($this->low + $this->range) >> 24) & 0xff);
+				$this->statistics[$this->currentByte] = $this->bytesOutput * 8 + $this->countStableBits(($this->low >> 16) & 0xff, (($this->low + $this->range) >> 16) & 0xff);
 				$this->currentByte++;
 			}
 			
 			while($this->firstByteStable() || $this->rangeUnderflow()) {
 				if($this->rangeUnderflow() && !$this->firstByteStable()) {
-					$this->range = (-$this->low & 0xffffffff) & (self::BOTTOM - 1);
+					$this->range = (-$this->low & 0xffffff) & (self::BOTTOM - 1);
 				}
 				
-				echo 'Emit digit: ' . dechex($this->low >> 24) . '<br />';
-				$this->stream->writeChar($this->low >> 24);
+				echo 'Emit digit: ' . dechex($this->low >> 16) . '<br />';
+				$this->stream->writeInt($this->low >> 16);
 				
 				if($this->keepStatistics) {
 					$this->bytesOutput++;
 				}
 				
-				$this->low = ($this->low << 8) & 0xffffffff;
-				$this->range = ($this->range << 8) & 0xffffffff;
+				$this->low = ($this->low << 8) & 0xffffff;
+				$this->range = ($this->range << 8) & 0xffffff;
 			}
 		}
 	}
 	
 	public function flush() {
 		for($currentByte = 0; $currentByte < 4; $currentByte++) {
-			echo 'Emit digit: ' . dechex($this->low >> 24) . '<br />';
-			$this->stream->writeChar($this->low >> 24);
-			$this->low = ($this->low << 8) & 0xffffffff;
+			echo 'Emit digit: ' . dechex($this->low >> 16) . '<br />';
+			$this->stream->writeInt($this->low >> 16);
+			$this->low = ($this->low << 8) & 0xffffff;
 			
 			if($this->keepStatistics) {
 				$this->bytesOutput++;
@@ -79,7 +79,7 @@ class RangeEncoder2 {
 	}
 	
 	private function firstByteStable() {
-		return (($this->low ^ ($this->low + $this->range)) & 0xffffffff) < self::TOP;
+		return (($this->low ^ ($this->low + $this->range)) & 0xffffff) < self::TOP;
 	}
 	
 	private function rangeUnderflow() {

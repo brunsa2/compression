@@ -1,5 +1,5 @@
 <?php
-
+/*
 function __autoload($class) {
 	$fileName = '';
 	for($character = 0; $character < strlen($class); $character++) {
@@ -11,7 +11,11 @@ function __autoload($class) {
 	}
 	
 	include_once($fileName . '.php');
-}
+}*/
+
+require_once('range_encoder_2.php');
+require_once('src/WriteStream.php');
+require_once('src/RangeEncoder.php');
 
 /*$unc = file_get_contents('moby_un.txt');
 $comp = new CompressionStream(new ReadStream($unc));
@@ -34,11 +38,22 @@ $arr = array();
 echo $stream->readCharsToArray($arr, 2, 5);
 print_r($arr);*/
 
-$x = 10;
-echo $x . '<br />';
-$y = ($x/=5) * 2;
-echo $x . '<br />';
-echo $y . '<br />';
+$streamOne = new WriteStream();
+$streamTwo = new WriteStream();
 
+$encOne = new RangeEncoder2($streamOne);
+$encTwo = new RangeEncoder($streamTwo, true);
+
+$encOne->encode(5, 7, 16);
+$encOne->encode(2, 19, 32);
+$encOne->encode(3, 4, 8);
+$encOne->flush();
+
+$encTwo->encodeSymbol(5, 7, 16);
+$encTwo->encodeSymbol(2, 19, 32);
+$encTwo->encodeSymbol(3, 4, 8);
+$encTwo->close();
+
+echo (string)$encOne->getStream() . "<br />" . (string)$encTwo->getStream();
 
 ?>

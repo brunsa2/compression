@@ -4,7 +4,7 @@
  * WriteStream.php contains class {@link WriteStream}.
  *
  * @author Jeff Stubler
- * @version 1.0
+ * @version 1.1
  * @package com.jeffstubler.streams;
  */
 
