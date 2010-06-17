@@ -21,6 +21,7 @@ require_once('src/RangeEncoder.php');
 require_once('src/RangeDecoder.php');
 require_once('src/CompressionStream.php');
 require_once('src/Order0Model.php');
+require_once('src/DecompressionStream.php');
 
 /*$unc = file_get_contents('moby_un.txt');
 $comp = new CompressionStream(new ReadStream($unc));
@@ -83,11 +84,14 @@ $decTwo->removeRange(3, 4, 8);
 echo $decTwo->getFrequency(64) . '<br />';
 $decTwo->removeRange(0, 5, 64);*/
 
-$stream = new CompressionStream(true);
-$stream->write('Hello World');
-echo $stream . '<br />';
+$cstream = new CompressionStream(true);
+$cstream->write('Hello World');
+echo $cstream . '<br />';
 
-echo 'Original length: ' . strlen ('Hello World') . '; Compressed length: ' . strlen($stream);
+echo 'Original length: ' . strlen ('Hello World') . '; Compressed length: ' . strlen($cstream) . '<br />';
+
+$dstream = new DecompressionStream(new ReadStream($cstream), true);
+echo $dstream . '<br />';
 
 /*
 for($xor = 0x80 ^ 0x90, $n = 8; $xor >= pow(2, 8 - $n); $n--);
