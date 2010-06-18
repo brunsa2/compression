@@ -3,8 +3,7 @@ Experiments in Data Compression
 
 Currently equipped with order-0 model and range encoder.
 
-Files
------
+32-Bit Compatibility
+--------------------
 
-Some of the files are not mine and may or may not contain their
-copyright notices. They are eventually going to be deleted.
+This code is currently not compatible with a 32-bit processor and PHP.
