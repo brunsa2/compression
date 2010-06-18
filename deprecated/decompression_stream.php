@@ -5,7 +5,7 @@ class DecompressionStream3 {
 	
 	public function __construct(ReadStream $inputStream) {
 		$decoder = new RangeDecoder2($inputStream);
-		$model = new Order0Model();
+		$model = new Order0Model2();
 		
 		$this->outputStream = new WriteStream();
 		
@@ -22,7 +22,7 @@ class DecompressionStream3 {
 			
 			$model->updateModel($symbol);
 			
-			$this->outputStream->writeChar($symbol);
+			$this->outputStream->writeInt($symbol);
 		}
 		
 		$table = $model->getFrequencyTable();

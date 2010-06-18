@@ -91,7 +91,14 @@ class RangeEncoder {
 		$this->stable = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00010000 : 0x0001000000000000;
 		$this->maximumRange = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00000100 : 0x0000010000000000;
 		$this->shiftDistance = $this->byteSize * (PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 2 : 6);
-		$this->closeByteOutput = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 4 : 8;
+		$this->closeByteOutput = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 3 : 7;
+		/*
+		$this->full = $this->range = 0xffffffff;
+		$this->stable = 0x1000000;
+		$this->maximumRange = 0x10000;
+		$this->shiftDistance = 24;
+		$this->closeByteOutput = 4;
+		*/
 	}
 	
 	/**
@@ -118,7 +125,7 @@ class RangeEncoder {
 				$this->range = (!$this->firstByteIsStable() && $this->rangeUnderflow()) ? ((-$this->low & $this->full) & ($this->maximumRange - 1)) : $this->range;
 				
 				$this->stream->writeInt($this->low >> $this->shiftDistance);
-				
+								
 				$this->low <<= $this->byteSize;
 				$this->low &= $this->full;
 				
@@ -151,20 +158,18 @@ class RangeEncoder {
 			throw new Exception('Range encoder has been closed');
 		} else {
 			for($currentByte = 0; $currentByte < $this->closeByteOutput; $currentByte++) {
-				//if($this->range > 0) {
+				if($this->range > 0) {
 					$this->stream->writeInt($this->low >> $this->shiftDistance);
-					//$this->bytesOutputToStream++;
-				//} else {
-				//break;
-				//}
+					$this->bytesOutputToStream++;
+				} else {
+				break;
+				}
 				
 				$this->low <<= $this->byteSize;
 				$this->low &= $this->full;
 				
-				//$this->range <<= $this->byteSize;
-				//$this->range &= $this->full;
-				
-				$this->bytesOutputToStream++;
+				$this->range <<= $this->byteSize;
+				$this->range &= $this->full;				
 			}
 		}
 		

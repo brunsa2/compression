@@ -75,8 +75,13 @@ class RangeDecoder {
 		$this->full = ($this->range = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00ffffff : 0x00ffffffffffffff);
 		$this->stable = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00010000 : 0x0001000000000000;
 		$this->maximumRange = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 0x00000100 : 0x0000010000000000;
-		$this->openByteInput = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 4 : 8;
-		
+		$this->openByteInput = PHP_INT_SIZE == 4 || $forceThirtyTwoBitMath ? 3 : 7;
+		/*
+		$this->full = $this->range = 0xffffffff;
+		$this->stable = 0x1000000;
+		$this->maximumRange = 0x10000;
+		$this->openByteInput = 4;
+		*/
 		for($currentByte = 0; $currentByte < $this->openByteInput; $currentByte++) {
 			$this->code = ($this->code << $this->byteSize) | $this->stream->read();
 		}
@@ -108,14 +113,11 @@ class RangeDecoder {
 		$this->low += $this->range * $low;
 		$this->range *= $high - $low;
 		
+		
 		while($this->firstByteIsStable() || $this->rangeUnderflow()) {
 			// Correct an underflow by expanding the range.
 			$this->range = (!$this->firstByteIsStable() && $this->rangeUnderflow()) ? ((-$this->low & $this->full) & ($this->maximumRange - 1)) : $this->range;
-			
-			if($this->stream->atEnd()) {
-				throw new Exception('Range decoder has run out of data');
-			}
-			
+
 			$this->code <<= $this->byteSize;
 			$this->code |= $this->stream->read();
 			$this->code &= $this->full;

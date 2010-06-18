@@ -1,6 +1,6 @@
 <?php
 
-class Order0Model {
+class Order0Model2 {
 	const NUMBER_OF_SYMBOLS = 257;
 	
 	private $frequencies;
@@ -26,7 +26,7 @@ class Order0Model {
 			$total = 0;
 			
 			for($currentSymbol = 1; $currentSymbol < self::NUMBER_OF_SYMBOLS - 1; $currentSymbol++) {
-				$total = $total + ((($this->frequencies[$currentSymbol] - $this->frequencies[$currentSymbol - 1])/2) + 1);
+				$total = $total + ((   ($this->frequencies[$currentSymbol] - $this->frequencies[$currentSymbol - 1])   /2) + 1);
 				$this->frequencies[$currentSymbol] = $this->frequencies[$currentSymbol - 1] + ((($this->frequencies[$currentSymbol] - $this->frequencies[$currentSymbol - 1])/2) + 1);
 			}
 			

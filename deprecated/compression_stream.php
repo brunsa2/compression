@@ -5,7 +5,7 @@ class CompressionStream3 {
 	
 	public function __construct(ReadStream $inputStream) {
 		$encoder = new RangeEncoder2(new WriteStream());
-		$model = new Order0Model();
+		$model = new Order0Model2();
 
 		while(!$inputStream->atEnd()) {
 			$symbol = $inputStream->read();
