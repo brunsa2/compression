@@ -22,9 +22,10 @@ require_once('src/Order0Model.php');
 require_once('src/DecompressionStream.php');
 require_once('src/UInt128.php');
 
-$i = new UInt128();
-$i->set(0x303);
-$i->shiftRight(4);
-echo ($i->get());
+$i = new UInt128('100', 16);
+$j = new UInt128(1);
+
+$i->multiply($j);
+echo $i->get() . '<br />';
 
 ?>
