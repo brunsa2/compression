@@ -20,13 +20,13 @@ require_once('src/RangeDecoder.php');
 require_once('src/CompressionStream.php');
 require_once('src/Order0Model.php');
 require_once('src/DecompressionStream.php');
+require_once('src/UInt128.php');
 
-$cstream = new CompressionStream(false);
-$cstream->write('Data Data Data Data Data Data Data Data Data Data');
-$cstream->close();
-echo $cstream . '<br />Original length: ' . strlen('Data Data Data Data Data Data Data Data Data Data') . '<br />Compressed length: ' . strlen($cstream) . '<br />';
+$i = new UInt128('1d', 16);
+$j = new UInt128('a5', 16);
 
-$dstream = new DecompressionStream(new ReadStream($cstream), false);
-echo $dstream . '<br />';
+$i->binaryXor($j);
+echo $i->get() . '<br />';
+echo $j->get() . '<br />';
 
 ?>
