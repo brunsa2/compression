@@ -14,7 +14,7 @@ class UInt128 {
 		} else {
 			$number = (string) $number;
 			
-			// Add automatic radix detecting code for stuff like 0x
+			// Add automatic radix detecting code for stuff like 0x, also only takes radix 2, 8, 10, or 16
 			
 			for($currentByte = 0; $currentByte < 16; $currentByte++) {
 				$this->digits[$currentByte] = 0;
@@ -200,24 +200,144 @@ class UInt128 {
 		return $preIncrementedValue;
 	}
 	
-	// this *= number
-	// sets this = this * number
+	// this *= multiplicand
+	// sets this = this * multiplicand
 	// returns this
-	public function multiply(UInt128 $number) {
+	public function multiply(UInt128 $multiplicand) {
 		$product = new UInt128();
+		$multiplicand = clone $multiplicand;
 		$multiplier = clone $this;
 		
 		do {
-			if(($number->digits[0] & 1) != 0) {
+			if(($multiplicand->digits[0] & 1) != 0) {
 				$product->add($multiplier);
 			}
 			
-			$number->shiftRight(1);
+			$multiplicand->shiftRight(1);
 			$multiplier->shiftLeft(1);
-		} while($number->compareTo(new UInt128(0)) != 0);
+		} while($multiplicand->compareTo(new UInt128(0)) != 0);
 		
 		for($currentByte = 0; $currentByte < 16; $currentByte++) {
 			$this->digits[$currentByte] = $product->digits[$currentByte];
+		}
+		
+		return $this;
+	}
+	
+	// this /= divisor
+	// sets this = this / divisor
+	// returns this
+	public function divide(UInt128 $divisor) {
+		if($divisor->compareTo(new UInt128(0)) == 0) {
+			throw new Exception('Division by zero');
+		}
+		
+		$divisor = clone $divisor;
+		$dividend = clone $this;
+		$quotient = new UInt128();
+		
+		$shiftCount = 0;
+		
+		while($divisor->compareTo($dividend) < 0 && (($divisor->digits[15] & 0x80) == 0)) {
+			$divisor->shiftLeft(1);
+			$shiftCount++;
+		}
+		
+		if($divisor->compareTo($dividend) > 0) {
+			$divisor->shiftRight(1);
+			$shiftCount--;
+		}
+		
+		for($currentIteration = 0; $currentIteration <= $shiftCount; $currentIteration++) {
+			if($divisor->compareTo($dividend) <= 0) {
+				$dividend->subtract($divisor);
+				$divisor->shiftRight(1);
+				$quotient->shiftLeft(1);
+				$quotient->postIncrement();
+			} else {
+				$divisor->shiftRight(1);
+				$quotient->shiftLeft(1);
+			}
+		}
+		
+		for($currentByte = 0; $currentByte < 16; $currentByte++) {
+			$this->digits[$currentByte] = $quotient->digits[$currentByte];
+		}
+		
+		return $this;
+	}
+	
+	// this %= divisor
+	// sets this = this % divisor
+	// returns this
+	public function modulus(UInt128 $divisor) {
+		if($divisor->compareTo(new UInt128(0)) == 0) {
+			throw new Exception('Division by zero');
+		}
+		
+		$divisor = clone $divisor;
+		$dividend = clone $this;
+		$quotient = new UInt128();
+		
+		$shiftCount = 0;
+		
+		while($divisor->compareTo($dividend) < 0 && (($divisor->digits[15] & 0x80) == 0)) {
+			$divisor->shiftLeft(1);
+			$shiftCount++;
+		}
+		
+		if($divisor->compareTo($dividend) > 0) {
+			$divisor->shiftRight(1);
+			$shiftCount--;
+		}
+		
+		for($currentIteration = 0; $currentIteration <= $shiftCount; $currentIteration++) {
+			if($divisor->compareTo($dividend) <= 0) {
+				$dividend->subtract($divisor);
+				$divisor->shiftRight(1);
+				$quotient->shiftLeft(1);
+				$quotient->postIncrement();
+			} else {
+				$divisor->shiftRight(1);
+				$quotient->shiftLeft(1);
+			}
+		}
+		
+		for($currentByte = 0; $currentByte < 16; $currentByte++) {
+			$this->digits[$currentByte] = $dividend->digits[$currentByte];
+		}
+		
+		return $this;
+	}
+	
+	// this &= number
+	// set this = this & number
+	// returns this
+	public function binaryAnd(UInt128 $number) {
+		for($currentByte = 0; $currentByte < 16; $currentByte++) {
+			$this->digits[$currentByte] &= $number->digits[$currentByte];
+		}
+		
+		return $this;
+	}
+	
+	// this |= number
+	// set this = this | number
+	// returns this
+	public function binaryOr(UInt128 $number) {
+		for($currentByte = 0; $currentByte < 16; $currentByte++) {
+			$this->digits[$currentByte] |= $number->digits[$currentByte];
+		}
+		
+		return $this;
+	}
+	
+	// this ^= number
+	// set this = this ^ number
+	// returns this
+	public function binaryXor(UInt128 $number) {
+		for($currentByte = 0; $currentByte < 16; $currentByte++) {
+			$this->digits[$currentByte] ^= $number->digits[$currentByte];
 		}
 		
 		return $this;

@@ -22,10 +22,11 @@ require_once('src/Order0Model.php');
 require_once('src/DecompressionStream.php');
 require_once('src/UInt128.php');
 
-$i = new UInt128('100', 16);
-$j = new UInt128(1);
+$i = new UInt128('1d', 16);
+$j = new UInt128('a5', 16);
 
-$i->multiply($j);
+$i->binaryXor($j);
 echo $i->get() . '<br />';
+echo $j->get() . '<br />';
 
 ?>
