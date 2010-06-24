@@ -228,7 +228,7 @@ class UInt128 {
 	// this /= divisor
 	// sets this = this / divisor
 	// returns this
-	public function divide(UInt128 $divisor) {
+	public function divideSelf(UInt128 $divisor) {
 		if($divisor->compareTo(new UInt128(0)) == 0) {
 			throw new Exception('Division by zero');
 		}
@@ -268,17 +268,23 @@ class UInt128 {
 		return $this;
 	}
 	
+	// returns dividend / divisor
+	public static function divide(UInt128 $dividend, UInt128 $divisor) {
+		$dividend = clone $dividend;
+		$dividend->divideSelf($divisor);
+		return $dividend;
+	}
+	
 	// this %= divisor
 	// sets this = this % divisor
 	// returns this
-	public function modulus(UInt128 $divisor) {
+	public function modulusSelf(UInt128 $divisor) {
 		if($divisor->compareTo(new UInt128(0)) == 0) {
 			throw new Exception('Division by zero');
 		}
 		
 		$divisor = clone $divisor;
 		$dividend = clone $this;
-		$quotient = new UInt128();
 		
 		$shiftCount = 0;
 		
@@ -296,11 +302,8 @@ class UInt128 {
 			if($divisor->compareTo($dividend) <= 0) {
 				$dividend->subtract($divisor);
 				$divisor->shiftRight(1);
-				$quotient->shiftLeft(1);
-				$quotient->postIncrement();
 			} else {
 				$divisor->shiftRight(1);
-				$quotient->shiftLeft(1);
 			}
 		}
 		
@@ -309,6 +312,13 @@ class UInt128 {
 		}
 		
 		return $this;
+	}
+	
+	// returns dividend % divisor
+	public static function modulus(UInt128 $dividend, UInt128 $divisor) {
+		$dividend = clone $dividend;
+		$dividend->modulusSelf($divisor);
+		return $dividend;
 	}
 	
 	// this &= number
@@ -359,14 +369,20 @@ class UInt128 {
 	
 	public function getHexString() {
 		$number = clone $this;
+		$radix = new UInt128(10);
 		$stringRepresentation = '';
 		
-		for($currentDigit = 7; $currentDigit >= 0; $currentDigit--) {
+		for($currentDigit = 3; $currentDigit >= 0; $currentDigit--) {
+			$nextDigit = UInt128::divide($number, UInt128::power($radix, new UInt128($currentDigit)));
+			$number = UInt128::modulus($number, UInt128::power($radix, new UInt128($currentDigit)));
 			
+			$stringRepresentation .= dechex($nextDigit->digits[0]);
 		}
+		
+		return $stringRepresentation;
 	}
 	
-	public function power(UInt128 $exponent) {
+	public function powerSelf(UInt128 $exponent) {
 		if($exponent->compareTo(new UInt128(0)) == 0) {
 			for($currentDigit = 0; $currentDigit < 16; $currentDigit++) {
 				$this->digits[$currentDigit] = $currentDigit == 0 ? 1 : 0;
@@ -382,11 +398,17 @@ class UInt128 {
 		return $this;
 	}
 	
+	public static function power(UInt128 $base, UInt128 $exponent) {
+		$base = clone $base;
+		$base->powerSelf($exponent);
+		return $base;
+	}
+	
 	public function __toString() {
 		$stringRepresentation = '';
 		
 		for($currentByte = 15; $currentByte >= 0; $currentByte--) {
-			$stringRepresentation .= $this->digits[$currentByte] . ($currentByte == 0 ? '' : ' ');
+			$stringRepresentation .= dechex($this->digits[$currentByte]) . ($currentByte == 0 ? '' : ' ');
 		}
 		
 		return $stringRepresentation;

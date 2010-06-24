@@ -22,11 +22,13 @@ require_once('src/Order0Model.php');
 require_once('src/DecompressionStream.php');
 require_once('src/UInt128.php');
 
-$i = new UInt128(10);
-$j = new UInt128(5);
+$i = new UInt128(16);
+$j = new UInt128(3);
+$k = new UInt128('1efd', 16);
 
-$i->power($j);
+$i->powerSelf($j);
 echo $i->get() . '<br />';
-echo $j->get() . '<br />';
+echo $j->get() . '<br /><br />';
+echo $k->getHexString() . '<br />';
 
 ?>
