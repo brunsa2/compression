@@ -46,7 +46,7 @@ class WriteStream {
 	 * string length left after offset).
 	 */
 	public function write($data = null, $offset = 0, $length = null) {
-		if(gettype($data) == 'array') {
+		if(is_array($data)) {
 			$length = $length == null ? count($data) - $offset : $length;
 			
 			if($offset < 0 || $offset > count($data) || $length < 0 || $length > count($data) - $offset) {
@@ -68,7 +68,7 @@ class WriteStream {
 					$this->streamData .= substr($stringRepresentation, $currentCharacter, 1);
 				}
 			}
-		} elseif(gettype($data) == 'string') {
+		} elseif(is_string($data)) {
 			$length = $length == null ? strlen($data) - $offset : $length;
 			
 			$data = substr($data, $offset, $length);
