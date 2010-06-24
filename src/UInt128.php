@@ -15,6 +15,7 @@ class UInt128 {
 			$number = (string) $number;
 			
 			// Add automatic radix detecting code for stuff like 0x, also only takes radix 2, 8, 10, or 16
+			// Convert intger cast to seperate methdod with switch block to remove issues like '2 ' becoming 20
 			
 			for($currentByte = 0; $currentByte < 16; $currentByte++) {
 				$this->digits[$currentByte] = 0;
@@ -354,6 +355,31 @@ class UInt128 {
 		}
 		
 		return $number;
+	}
+	
+	public function getHexString() {
+		$number = clone $this;
+		$stringRepresentation = '';
+		
+		for($currentDigit = 7; $currentDigit >= 0; $currentDigit--) {
+			
+		}
+	}
+	
+	public function power(UInt128 $exponent) {
+		if($exponent->compareTo(new UInt128(0)) == 0) {
+			for($currentDigit = 0; $currentDigit < 16; $currentDigit++) {
+				$this->digits[$currentDigit] = $currentDigit == 0 ? 1 : 0;
+			}
+		} else {
+			$base = clone $this;
+			
+			for($currentPower = 1; $exponent->compareTo(new UInt128($currentPower)) > 0; $currentPower++) {
+				$this->multiply($base);
+			}
+		}
+		
+		return $this;
 	}
 	
 	public function __toString() {
