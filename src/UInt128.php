@@ -14,9 +14,6 @@ class UInt128 {
 		} else {
 			$number = (string) $number;
 			
-			// Add automatic radix detecting code for stuff like 0x, also only takes radix 2, 8, 10, or 16
-			// Convert intger cast to seperate methdod with switch block to remove issues like '2 ' becoming 20
-			
 			if(substr($number, 0, 1) == '0') {
 				$number = substr($number, 1);
 				
@@ -37,7 +34,7 @@ class UInt128 {
 			}
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($number); $currentCharacter++) {
-				$currentNumber = getDigit(substr($number, $currentCharacter, 1));
+				$currentNumber = self::getNumberFromDigit(substr($number, $currentCharacter, 1), $radix);
 				
 				$this->multiply(new UInt128($radix));
 				$this->add(new UInt128($currentNumber));
@@ -45,9 +42,32 @@ class UInt128 {
 		}
 	}
 	
-	private function getDigit($digit) {
+	private function getNumberFromDigit($digit, $radix) {
 		switch($digit) {
-			case '0': break;
+			case '0': return 0;
+			case '1': return 1;
+			case '2': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 2;
+			case '3': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 3;
+			case '4': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 4;
+			case '5': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 5;
+			case '6': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 6;
+			case '7': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 7;
+			case '8': if(!($radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 8;
+			case '9': if(!($radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 9;
+			case 'A': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 10;
+			case 'a': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 10;
+			case 'B': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 11;
+			case 'b': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 11;
+			case 'C': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 12;
+			case 'c': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 12;
+			case 'D': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 13;
+			case 'd': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 13;
+			case 'E': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 14;
+			case 'e': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 14;
+			case 'F': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 15;
+			case 'f': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 15;
+			default:
+				throw new Exception('Invalid digit in number');
 		}
 	}
 
@@ -388,16 +408,40 @@ class UInt128 {
 		return $number;
 	}
 	
-	public function getHexString() {
-		$number = clone $this;
-		$radix = new UInt128(2);
-		$stringRepresentation = '';
+	public function getString($radix = 10) {
+		if(!($radix == 2 || $radix == 8 || $radix == 10 || $radix == 16)) {
+			throw new Exception('Invalid radix');
+		}
 		
-		for($currentDigit = 20; $currentDigit >= 0; $currentDigit--) {
-			$nextDigit = UInt128::divide($number, power($radix, new UInt128($currentDigit)));
-			$number = UInt128::modulus($number, power($radix, new UInt128($currentDigit)));
+		$numberOfDigits = 0;
+		
+		switch($radix) {
+			case 2:
+				$numberOfDigits = 127;
+				break;
+			case 8:
+				$numberOfDigits = 42;
+				break;
+			case 10:
+				$numberOfDigits = 38;
+				break;
+			case 16:
+				$numberOfDigits = 31;
+		}
+		
+		$number = clone $this;
+		$radix = new UInt128($radix);
+		$stringRepresentation = '';
+		$emitZeroes = false;
+		
+		for($currentDigit = $numberOfDigits; $currentDigit >= 0; $currentDigit--) {
+			$nextDigit = UInt128::divide($number, self::power($radix, new UInt128($currentDigit)));
+			$number = UInt128::modulus($number, self::power($radix, new UInt128($currentDigit)));
 			
-			$stringRepresentation .= dechex($nextDigit->digits[0]);
+			if(($nextDigit->digits[0] == 0 && $emitZeroes) || $nextDigit->digits[0] != 0) {
+				$stringRepresentation .= dechex($nextDigit->digits[0]);
+				$emitZeroes = true;
+			}
 		}
 		
 		return $stringRepresentation;
