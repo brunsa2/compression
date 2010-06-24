@@ -116,8 +116,12 @@ class UInt128 {
 	// for a (*) b
 	// a.compareTo(b) (*) 0
 	// use operator for what is wanted
-	public function compareTo(UInt128 $number) {
+	public function compareTo($number) {
 		$comparison = 0;
+		
+		if(is_numeric($number)) {
+			$number = new UInt128($number);
+		}
 		
 		for($currentByte = 15; $currentByte >= 0; $currentByte--) {
 			if($comparison == 0) {
@@ -137,8 +141,12 @@ class UInt128 {
 	// this += number
 	// sets this = this + number
 	// returns this
-	public function add(UInt128 $number) {
+	public function add($number) {
 		$carry = 0;
+		
+		if(is_numeric($number)) {
+			$number = new UInt128($number);
+		}
 		
 		for($currentByte = 0; $currentByte < 16; $currentByte++) {
 			$this->digits[$currentByte] += $number->digits[$currentByte] + $carry;
@@ -190,8 +198,12 @@ class UInt128 {
 	// this -= number
 	// sets this = this - number
 	// returns this
-	public function subtract(UInt128 $number) {
+	public function subtract($number) {
 		$borrow = 0;
+		
+		if(is_numeric($number)) {
+			$number = new UInt128($number);
+		}
 		
 		for($currentByte = 0; $currentByte < 16; $currentByte++) {
 			$this->digits[$currentByte] -= $number->digits[$currentByte] + $borrow;
@@ -470,13 +482,7 @@ class UInt128 {
 	}
 	
 	public function __toString() {
-		$stringRepresentation = '';
-		
-		for($currentByte = 15; $currentByte >= 0; $currentByte--) {
-			$stringRepresentation .= dechex($this->digits[$currentByte]) . ($currentByte == 0 ? '' : ' ');
-		}
-		
-		return $stringRepresentation;
+		return $this->getString(10);
 	}
 }
 

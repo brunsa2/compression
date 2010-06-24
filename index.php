@@ -22,14 +22,7 @@ require_once('src/Order0Model.php');
 require_once('src/DecompressionStream.php');
 require_once('src/UInt128.php');
 
-$i = new UInt128('0xffffffffffffffffffffffffffffffff');
-//$k = new UInt128('1efd', 16);
+$i = new UInt128(12345);
 
-echo $i->getString(2) . '<br />';
-echo $i->getString(8) . '<br />';
-echo $i->getString() . '<br />';
-echo $i->getString(16) . '<br />';
-echo strlen('11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111') . '<br />';
-echo strlen('3777777777777777777777777777777777777777777') . '<br />';
-echo strlen('ffffffffffffffffffffffffffffffff') . '<br />';
+echo $i->add(54321);
 ?>
