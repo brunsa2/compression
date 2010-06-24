@@ -17,16 +17,37 @@ class UInt128 {
 			// Add automatic radix detecting code for stuff like 0x, also only takes radix 2, 8, 10, or 16
 			// Convert intger cast to seperate methdod with switch block to remove issues like '2 ' becoming 20
 			
+			if(substr($number, 0, 1) == '0') {
+				$number = substr($number, 1);
+				
+				if(substr($number, 0, 1) == 'x') {
+					$radix = 16;
+					$number = substr($number, 1);
+				} else {
+					$radix = 8;
+				}
+			}
+			
+			if(!($radix == 2 || $radix == 8 || $radix == 10 || $radix == 16)) {
+				throw new Exception('Invalid radix');
+			}
+			
 			for($currentByte = 0; $currentByte < 16; $currentByte++) {
 				$this->digits[$currentByte] = 0;
 			}
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($number); $currentCharacter++) {
-				$currentNumber = (integer) hexdec(substr($number, $currentCharacter, 1));
+				$currentNumber = getDigit(substr($number, $currentCharacter, 1));
 				
 				$this->multiply(new UInt128($radix));
 				$this->add(new UInt128($currentNumber));
 			}
+		}
+	}
+	
+	private function getDigit($digit) {
+		switch($digit) {
+			case '0': break;
 		}
 	}
 
@@ -369,12 +390,12 @@ class UInt128 {
 	
 	public function getHexString() {
 		$number = clone $this;
-		$radix = new UInt128(10);
+		$radix = new UInt128(2);
 		$stringRepresentation = '';
 		
-		for($currentDigit = 3; $currentDigit >= 0; $currentDigit--) {
-			$nextDigit = UInt128::divide($number, UInt128::power($radix, new UInt128($currentDigit)));
-			$number = UInt128::modulus($number, UInt128::power($radix, new UInt128($currentDigit)));
+		for($currentDigit = 20; $currentDigit >= 0; $currentDigit--) {
+			$nextDigit = UInt128::divide($number, power($radix, new UInt128($currentDigit)));
+			$number = UInt128::modulus($number, power($radix, new UInt128($currentDigit)));
 			
 			$stringRepresentation .= dechex($nextDigit->digits[0]);
 		}
