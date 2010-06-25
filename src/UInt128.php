@@ -119,8 +119,12 @@ class UInt128 {
 	public function compareTo($number) {
 		$comparison = 0;
 		
-		if(is_numeric($number)) {
+		if(is_integer($number) || is_string($number)) {
 			$number = new UInt128($number);
+		}
+		
+		if(get_class($number) != 'UInt128') {
+			throw new Exception('Invalid number');
 		}
 		
 		for($currentByte = 15; $currentByte >= 0; $currentByte--) {
@@ -144,8 +148,12 @@ class UInt128 {
 	public function add($number) {
 		$carry = 0;
 		
-		if(is_numeric($number)) {
+		if(is_integer($number) || is_string($number)) {
 			$number = new UInt128($number);
+		}
+		
+		if(get_class($number) != 'UInt128') {
+			throw new Exception('Invalid number');
 		}
 		
 		for($currentByte = 0; $currentByte < 16; $currentByte++) {
@@ -201,8 +209,12 @@ class UInt128 {
 	public function subtract($number) {
 		$borrow = 0;
 		
-		if(is_numeric($number)) {
+		if(is_integer($number) || is_string($number)) {
 			$number = new UInt128($number);
+		}
+		
+		if(get_class($number) != 'UInt128') {
+			throw new Exception('Invalid number');
 		}
 		
 		for($currentByte = 0; $currentByte < 16; $currentByte++) {
