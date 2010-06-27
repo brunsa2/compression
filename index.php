@@ -22,9 +22,7 @@ require_once('src/Order0Model.php');
 require_once('src/DecompressionStream.php');
 require_once('src/UInt128.php');
 
-$cstream = new CompressionStream();
-$cstream->write('The quick brown fox jumps over a lazy dog.');
-echo 'Original length: ' . strlen('The quick brown fox jumps over a lazy dog.') . '; Original: The quick brown fox jumps over a lazy dog.<br />';
-echo 'Compressed length: ' . strlen($cstream->getStream()) . '; Compressed: ' . $cstream->getStream() . '<br />';
+$i = new UInt128('12345');
 
+echo $i->add('54321');
 ?>

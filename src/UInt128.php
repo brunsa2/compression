@@ -14,18 +14,60 @@ class UInt128 {
 		} else {
 			$number = (string) $number;
 			
-			// Add automatic radix detecting code for stuff like 0x, also only takes radix 2, 8, 10, or 16
+			if(substr($number, 0, 1) == '0') {
+				$number = substr($number, 1);
+				
+				if(substr($number, 0, 1) == 'x') {
+					$radix = 16;
+					$number = substr($number, 1);
+				} else {
+					$radix = 8;
+				}
+			}
+			
+			if(!($radix == 2 || $radix == 8 || $radix == 10 || $radix == 16)) {
+				throw new Exception('Invalid radix');
+			}
 			
 			for($currentByte = 0; $currentByte < 16; $currentByte++) {
 				$this->digits[$currentByte] = 0;
 			}
 			
 			for($currentCharacter = 0; $currentCharacter < strlen($number); $currentCharacter++) {
-				$currentNumber = (integer) hexdec(substr($number, $currentCharacter, 1));
+				$currentNumber = self::getNumberFromDigit(substr($number, $currentCharacter, 1), $radix);
 				
 				$this->multiply(new UInt128($radix));
 				$this->add(new UInt128($currentNumber));
 			}
+		}
+	}
+	
+	private function getNumberFromDigit($digit, $radix) {
+		switch($digit) {
+			case '0': return 0;
+			case '1': return 1;
+			case '2': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 2;
+			case '3': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 3;
+			case '4': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 4;
+			case '5': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 5;
+			case '6': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 6;
+			case '7': if(!($radix == 8 || $radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 7;
+			case '8': if(!($radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 8;
+			case '9': if(!($radix == 10 || $radix == 16)) { throw new Exception('Invalid digit in number'); } return 9;
+			case 'A': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 10;
+			case 'a': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 10;
+			case 'B': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 11;
+			case 'b': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 11;
+			case 'C': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 12;
+			case 'c': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 12;
+			case 'D': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 13;
+			case 'd': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 13;
+			case 'E': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 14;
+			case 'e': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 14;
+			case 'F': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 15;
+			case 'f': if(!($radix == 16)) { throw new Exception('Invalid digit in number'); } return 15;
+			default:
+				throw new Exception('Invalid digit in number');
 		}
 	}
 
@@ -74,8 +116,16 @@ class UInt128 {
 	// for a (*) b
 	// a.compareTo(b) (*) 0
 	// use operator for what is wanted
-	public function compareTo(UInt128 $number) {
+	public function compareTo($number) {
 		$comparison = 0;
+		
+		if(is_integer($number) || is_string($number)) {
+			$number = new UInt128($number);
+		}
+		
+		if(get_class($number) != 'UInt128') {
+			throw new Exception('Invalid number');
+		}
 		
 		for($currentByte = 15; $currentByte >= 0; $currentByte--) {
 			if($comparison == 0) {
@@ -95,8 +145,16 @@ class UInt128 {
 	// this += number
 	// sets this = this + number
 	// returns this
-	public function add(UInt128 $number) {
+	public function add($number) {
 		$carry = 0;
+		
+		if(is_integer($number) || is_string($number)) {
+			$number = new UInt128($number);
+		}
+		
+		if(get_class($number) != 'UInt128') {
+			throw new Exception('Invalid number');
+		}
 		
 		for($currentByte = 0; $currentByte < 16; $currentByte++) {
 			$this->digits[$currentByte] += $number->digits[$currentByte] + $carry;
@@ -148,8 +206,16 @@ class UInt128 {
 	// this -= number
 	// sets this = this - number
 	// returns this
-	public function subtract(UInt128 $number) {
+	public function subtract($number) {
 		$borrow = 0;
+		
+		if(is_integer($number) || is_string($number)) {
+			$number = new UInt128($number);
+		}
+		
+		if(get_class($number) != 'UInt128') {
+			throw new Exception('Invalid number');
+		}
 		
 		for($currentByte = 0; $currentByte < 16; $currentByte++) {
 			$this->digits[$currentByte] -= $number->digits[$currentByte] + $borrow;
@@ -227,7 +293,7 @@ class UInt128 {
 	// this /= divisor
 	// sets this = this / divisor
 	// returns this
-	public function divide(UInt128 $divisor) {
+	public function divideSelf(UInt128 $divisor) {
 		if($divisor->compareTo(new UInt128(0)) == 0) {
 			throw new Exception('Division by zero');
 		}
@@ -267,17 +333,23 @@ class UInt128 {
 		return $this;
 	}
 	
+	// returns dividend / divisor
+	public static function divide(UInt128 $dividend, UInt128 $divisor) {
+		$dividend = clone $dividend;
+		$dividend->divideSelf($divisor);
+		return $dividend;
+	}
+	
 	// this %= divisor
 	// sets this = this % divisor
 	// returns this
-	public function modulus(UInt128 $divisor) {
+	public function modulusSelf(UInt128 $divisor) {
 		if($divisor->compareTo(new UInt128(0)) == 0) {
 			throw new Exception('Division by zero');
 		}
 		
 		$divisor = clone $divisor;
 		$dividend = clone $this;
-		$quotient = new UInt128();
 		
 		$shiftCount = 0;
 		
@@ -295,11 +367,8 @@ class UInt128 {
 			if($divisor->compareTo($dividend) <= 0) {
 				$dividend->subtract($divisor);
 				$divisor->shiftRight(1);
-				$quotient->shiftLeft(1);
-				$quotient->postIncrement();
 			} else {
 				$divisor->shiftRight(1);
-				$quotient->shiftLeft(1);
 			}
 		}
 		
@@ -308,6 +377,13 @@ class UInt128 {
 		}
 		
 		return $this;
+	}
+	
+	// returns dividend % divisor
+	public static function modulus(UInt128 $dividend, UInt128 $divisor) {
+		$dividend = clone $dividend;
+		$dividend->modulusSelf($divisor);
+		return $dividend;
 	}
 	
 	// this &= number
@@ -356,14 +432,69 @@ class UInt128 {
 		return $number;
 	}
 	
-	public function __toString() {
-		$stringRepresentation = '';
+	public function getString($radix = 10) {
+		if(!($radix == 2 || $radix == 8 || $radix == 10 || $radix == 16)) {
+			throw new Exception('Invalid radix');
+		}
 		
-		for($currentByte = 15; $currentByte >= 0; $currentByte--) {
-			$stringRepresentation .= $this->digits[$currentByte] . ($currentByte == 0 ? '' : ' ');
+		$numberOfDigits = 0;
+		
+		switch($radix) {
+			case 2:
+				$numberOfDigits = 127;
+				break;
+			case 8:
+				$numberOfDigits = 42;
+				break;
+			case 10:
+				$numberOfDigits = 38;
+				break;
+			case 16:
+				$numberOfDigits = 31;
+		}
+		
+		$number = clone $this;
+		$radix = new UInt128($radix);
+		$stringRepresentation = '';
+		$emitZeroes = false;
+		
+		for($currentDigit = $numberOfDigits; $currentDigit >= 0; $currentDigit--) {
+			$nextDigit = UInt128::divide($number, self::power($radix, new UInt128($currentDigit)));
+			$number = UInt128::modulus($number, self::power($radix, new UInt128($currentDigit)));
+			
+			if(($nextDigit->digits[0] == 0 && $emitZeroes) || $nextDigit->digits[0] != 0) {
+				$stringRepresentation .= dechex($nextDigit->digits[0]);
+				$emitZeroes = true;
+			}
 		}
 		
 		return $stringRepresentation;
+	}
+	
+	public function powerSelf(UInt128 $exponent) {
+		if($exponent->compareTo(new UInt128(0)) == 0) {
+			for($currentDigit = 0; $currentDigit < 16; $currentDigit++) {
+				$this->digits[$currentDigit] = $currentDigit == 0 ? 1 : 0;
+			}
+		} else {
+			$base = clone $this;
+			
+			for($currentPower = 1; $exponent->compareTo(new UInt128($currentPower)) > 0; $currentPower++) {
+				$this->multiply($base);
+			}
+		}
+		
+		return $this;
+	}
+	
+	public static function power(UInt128 $base, UInt128 $exponent) {
+		$base = clone $base;
+		$base->powerSelf($exponent);
+		return $base;
+	}
+	
+	public function __toString() {
+		return $this->getString(10);
 	}
 }
 
